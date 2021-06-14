@@ -38,6 +38,7 @@ class ReportProjectRepository extends ServiceEntityRepository
 
     /*
     public function findOneBySomeField($value): ?ReportProject
+    
     {
         return $this->createQueryBuilder('r')
             ->andWhere('r.exampleField = :val')

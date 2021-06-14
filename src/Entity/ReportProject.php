@@ -18,16 +18,16 @@ class ReportProject
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Account::class, inversedBy="reportProjects")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $idAccount;
-
-    /**
      * @ORM\ManyToOne(targetEntity=Project::class, inversedBy="reportProjects")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $idProject;
+    private $project;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Account::class, inversedBy="reportProjects")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $account;
 
     /**
      * @ORM\Column(type="datetime")
@@ -49,26 +49,26 @@ class ReportProject
         return $this->id;
     }
 
-    public function getIdAccount(): ?Account
+    public function getProject(): ?Project
     {
-        return $this->idAccount;
+        return $this->project;
     }
 
-    public function setIdAccount(?Account $idAccount): self
+    public function setProject(?Project $project): self
     {
-        $this->idAccount = $idAccount;
+        $this->project = $project;
 
         return $this;
     }
 
-    public function getIdProject(): ?Project
+    public function getAccount(): ?Account
     {
-        return $this->idProject;
+        return $this->account;
     }
 
-    public function setIdProject(?Project $idProject): self
+    public function setAccount(?Account $account): self
     {
-        $this->idProject = $idProject;
+        $this->account = $account;
 
         return $this;
     }

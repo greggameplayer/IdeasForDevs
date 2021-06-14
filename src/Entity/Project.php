@@ -70,21 +70,21 @@ class Project
     private $commentaries;
 
     /**
-     * @ORM\OneToMany(targetEntity=ReportProject::class, mappedBy="idProject", orphanRemoval=true)
-     */
-    private $reportProjects;
-
-    /**
      * @ORM\OneToMany(targetEntity=IsFor::class, mappedBy="idProject", orphanRemoval=true)
      */
     private $isFors;
+
+    /**
+     * @ORM\OneToMany(targetEntity=ReportProject::class, mappedBy="project", orphanRemoval=true)
+     */
+    private $reportProjects;
 
     public function __construct()
     {
         $this->applies = new ArrayCollection();
         $this->commentaries = new ArrayCollection();
-        $this->reportProjects = new ArrayCollection();
         $this->isFors = new ArrayCollection();
+        $this->reportProjects = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -248,35 +248,8 @@ class Project
         return $this;
     }
 
-    /**
-     * @return Collection|ReportProject[]
-     */
-    public function getReportProjects(): Collection
-    {
-        return $this->reportProjects;
-    }
+   
 
-    public function addReportProject(ReportProject $reportProject): self
-    {
-        if (!$this->reportProjects->contains($reportProject)) {
-            $this->reportProjects[] = $reportProject;
-            $reportProject->setIdProject($this);
-        }
-
-        return $this;
-    }
-
-    public function removeReportProject(ReportProject $reportProject): self
-    {
-        if ($this->reportProjects->removeElement($reportProject)) {
-            // set the owning side to null (unless already changed)
-            if ($reportProject->getIdProject() === $this) {
-                $reportProject->setIdProject(null);
-            }
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection|IsFor[]
@@ -302,6 +275,36 @@ class Project
             // set the owning side to null (unless already changed)
             if ($isFor->getIdProject() === $this) {
                 $isFor->setIdProject(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ReportProject[]
+     */
+    public function getReportProjects(): Collection
+    {
+        return $this->reportProjects;
+    }
+
+    public function addReportProject(ReportProject $reportProject): self
+    {
+        if (!$this->reportProjects->contains($reportProject)) {
+            $this->reportProjects[] = $reportProject;
+            $reportProject->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReportProject(ReportProject $reportProject): self
+    {
+        if ($this->reportProjects->removeElement($reportProject)) {
+            // set the owning side to null (unless already changed)
+            if ($reportProject->getProject() === $this) {
+                $reportProject->setProject(null);
             }
         }
 

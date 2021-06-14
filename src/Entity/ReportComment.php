@@ -18,16 +18,16 @@ class ReportComment
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Account::class, inversedBy="reportComments")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $idAccount;
-
-    /**
      * @ORM\ManyToOne(targetEntity=Commentary::class, inversedBy="reportComments")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $idComment;
+    private $commentary;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Account::class, inversedBy="reportComments")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $account;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -49,26 +49,26 @@ class ReportComment
         return $this->id;
     }
 
-    public function getIdAccount(): ?Account
+    public function getCommentary(): ?Commentary
     {
-        return $this->idAccount;
+        return $this->commentary;
     }
 
-    public function setIdAccount(?Account $idAccount): self
+    public function setCommentary(?Commentary $commentary): self
     {
-        $this->idAccount = $idAccount;
+        $this->commentary = $commentary;
 
         return $this;
     }
 
-    public function getIdComment(): ?Commentary
+    public function getAccount(): ?Account
     {
-        return $this->idComment;
+        return $this->account;
     }
 
-    public function setIdComment(?Commentary $idComment): self
+    public function setAccount(?Account $account): self
     {
-        $this->idComment = $idComment;
+        $this->account = $account;
 
         return $this;
     }

@@ -41,7 +41,7 @@ class Commentary
     private $dateComment;
 
     /**
-     * @ORM\OneToMany(targetEntity=ReportComment::class, mappedBy="idComment", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=ReportComment::class, mappedBy="commentary", orphanRemoval=true)
      */
     private $reportComments;
 
@@ -49,6 +49,7 @@ class Commentary
     {
         $this->reportComments = new ArrayCollection();
     }
+
 
     public function getId(): ?int
     {
@@ -115,7 +116,7 @@ class Commentary
     {
         if (!$this->reportComments->contains($reportComment)) {
             $this->reportComments[] = $reportComment;
-            $reportComment->setIdComment($this);
+            $reportComment->setCommentary($this);
         }
 
         return $this;
@@ -125,11 +126,13 @@ class Commentary
     {
         if ($this->reportComments->removeElement($reportComment)) {
             // set the owning side to null (unless already changed)
-            if ($reportComment->getIdComment() === $this) {
-                $reportComment->setIdComment(null);
+            if ($reportComment->getCommentary() === $this) {
+                $reportComment->setCommentary(null);
             }
         }
 
         return $this;
     }
+
+
 }

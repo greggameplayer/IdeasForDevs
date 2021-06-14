@@ -21,13 +21,13 @@ class ReportUser
      * @ORM\ManyToOne(targetEntity=Account::class, inversedBy="reporters")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $idReporter;
+    private $reporter;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Account::class, inversedBy="reportedUsers")
+     * @ORM\ManyToOne(targetEntity=Account::class, inversedBy="reporteds")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $idReported;
+    private $reported;
 
     /**
      * @ORM\Column(type="datetime")
@@ -49,26 +49,26 @@ class ReportUser
         return $this->id;
     }
 
-    public function getIdReporter(): ?Account
+    public function getReporter(): ?Account
     {
-        return $this->idReporter;
+        return $this->reporter;
     }
 
-    public function setIdReporter(?Account $idReporter): self
+    public function setReporter(?Account $reporter): self
     {
-        $this->idReporter = $idReporter;
+        $this->reporter = $reporter;
 
         return $this;
     }
 
-    public function getIdReported(): ?Account
+    public function getReported(): ?Account
     {
-        return $this->idReported;
+        return $this->reported;
     }
 
-    public function setIdReported(?Account $idReported): self
+    public function setReported(?Account $reported): self
     {
-        $this->idReported = $idReported;
+        $this->reported = $reported;
 
         return $this;
     }

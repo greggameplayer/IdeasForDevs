@@ -84,15 +84,6 @@ class Account
      */
     private $commentaries;
 
-    /**
-     * @ORM\OneToMany(targetEntity=ReportComment::class, mappedBy="idAccount", orphanRemoval=true)
-     */
-    private $reportComments;
-
-    /**
-     * @ORM\OneToMany(targetEntity=ReportProject::class, mappedBy="idAccount", orphanRemoval=true)
-     */
-    private $reportProjects;
 
     /**
      * @ORM\OneToMany(targetEntity=IsFor::class, mappedBy="idAccount")
@@ -100,24 +91,35 @@ class Account
     private $isFors;
 
     /**
-     * @ORM\OneToMany(targetEntity=ReportUser::class, mappedBy="idReporter", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=ReportUser::class, mappedBy="reporter", orphanRemoval=true)
      */
     private $reporters;
 
     /**
-     * @ORM\OneToMany(targetEntity=ReportUser::class, mappedBy="idReported", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=ReportUser::class, mappedBy="reported", orphanRemoval=true)
      */
-    private $reportedUsers;
+    private $reporteds;
+
+    /**
+     * @ORM\OneToMany(targetEntity=ReportComment::class, mappedBy="account", orphanRemoval=true)
+     */
+    private $reportComments;
+
+    /**
+     * @ORM\OneToMany(targetEntity=ReportProject::class, mappedBy="account", orphanRemoval=true)
+     */
+    private $reportProjects;
+
 
     public function __construct()
     {
         $this->applies = new ArrayCollection();
         $this->commentaries = new ArrayCollection();
-        $this->reportComments = new ArrayCollection();
-        $this->reportProjects = new ArrayCollection();
         $this->isFors = new ArrayCollection();
         $this->reporters = new ArrayCollection();
-        $this->reportedUsers = new ArrayCollection();
+        $this->reporteds = new ArrayCollection();
+        $this->reportComments = new ArrayCollection();
+        $this->reportProjects = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -317,65 +319,9 @@ class Account
         return $this;
     }
 
-    /**
-     * @return Collection|ReportComment[]
-     */
-    public function getReportComments(): Collection
-    {
-        return $this->reportComments;
-    }
 
-    public function addReportComment(ReportComment $reportComment): self
-    {
-        if (!$this->reportComments->contains($reportComment)) {
-            $this->reportComments[] = $reportComment;
-            $reportComment->setIdAccount($this);
-        }
 
-        return $this;
-    }
 
-    public function removeReportComment(ReportComment $reportComment): self
-    {
-        if ($this->reportComments->removeElement($reportComment)) {
-            // set the owning side to null (unless already changed)
-            if ($reportComment->getIdAccount() === $this) {
-                $reportComment->setIdAccount(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|ReportProject[]
-     */
-    public function getReportProjects(): Collection
-    {
-        return $this->reportProjects;
-    }
-
-    public function addReportProject(ReportProject $reportProject): self
-    {
-        if (!$this->reportProjects->contains($reportProject)) {
-            $this->reportProjects[] = $reportProject;
-            $reportProject->setIdAccount($this);
-        }
-
-        return $this;
-    }
-
-    public function removeReportProject(ReportProject $reportProject): self
-    {
-        if ($this->reportProjects->removeElement($reportProject)) {
-            // set the owning side to null (unless already changed)
-            if ($reportProject->getIdAccount() === $this) {
-                $reportProject->setIdAccount(null);
-            }
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection|IsFor[]
@@ -419,7 +365,7 @@ class Account
     {
         if (!$this->reporters->contains($reporter)) {
             $this->reporters[] = $reporter;
-            $reporter->setIdReporter($this);
+            $reporter->setReporter($this);
         }
 
         return $this;
@@ -429,8 +375,8 @@ class Account
     {
         if ($this->reporters->removeElement($reporter)) {
             // set the owning side to null (unless already changed)
-            if ($reporter->getIdReporter() === $this) {
-                $reporter->setIdReporter(null);
+            if ($reporter->getReporter() === $this) {
+                $reporter->setReporter(null);
             }
         }
 
@@ -440,30 +386,91 @@ class Account
     /**
      * @return Collection|ReportUser[]
      */
-    public function getReportedUsers(): Collection
+    public function getReporteds(): Collection
     {
-        return $this->reportedUsers;
+        return $this->reporteds;
     }
 
-    public function addReportedUser(ReportUser $reportedUser): self
+    public function addReported(ReportUser $reported): self
     {
-        if (!$this->reportedUsers->contains($reportedUser)) {
-            $this->reportedUsers[] = $reportedUser;
-            $reportedUser->setIdReported($this);
+        if (!$this->reporteds->contains($reported)) {
+            $this->reporteds[] = $reported;
+            $reported->setReported($this);
         }
 
         return $this;
     }
 
-    public function removeReportedUser(ReportUser $reportedUser): self
+    public function removeReported(ReportUser $reported): self
     {
-        if ($this->reportedUsers->removeElement($reportedUser)) {
+        if ($this->reporteds->removeElement($reported)) {
             // set the owning side to null (unless already changed)
-            if ($reportedUser->getIdReported() === $this) {
-                $reportedUser->setIdReported(null);
+            if ($reported->getReported() === $this) {
+                $reported->setReported(null);
             }
         }
 
         return $this;
     }
+
+    /**
+     * @return Collection|ReportComment[]
+     */
+    public function getReportComments(): Collection
+    {
+        return $this->reportComments;
+    }
+
+    public function addReportComment(ReportComment $reportComment): self
+    {
+        if (!$this->reportComments->contains($reportComment)) {
+            $this->reportComments[] = $reportComment;
+            $reportComment->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReportComment(ReportComment $reportComment): self
+    {
+        if ($this->reportComments->removeElement($reportComment)) {
+            // set the owning side to null (unless already changed)
+            if ($reportComment->getAccount() === $this) {
+                $reportComment->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ReportProject[]
+     */
+    public function getReportProjects(): Collection
+    {
+        return $this->reportProjects;
+    }
+
+    public function addReportProject(ReportProject $reportProject): self
+    {
+        if (!$this->reportProjects->contains($reportProject)) {
+            $this->reportProjects[] = $reportProject;
+            $reportProject->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReportProject(ReportProject $reportProject): self
+    {
+        if ($this->reportProjects->removeElement($reportProject)) {
+            // set the owning side to null (unless already changed)
+            if ($reportProject->getAccount() === $this) {
+                $reportProject->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
 }
