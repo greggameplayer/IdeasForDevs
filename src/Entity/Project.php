@@ -74,11 +74,17 @@ class Project
      */
     private $reportProjects;
 
+    /**
+     * @ORM\OneToMany(targetEntity=IsFor::class, mappedBy="idProject", orphanRemoval=true)
+     */
+    private $isFors;
+
     public function __construct()
     {
         $this->applies = new ArrayCollection();
         $this->commentaries = new ArrayCollection();
         $this->reportProjects = new ArrayCollection();
+        $this->isFors = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -266,6 +272,36 @@ class Project
             // set the owning side to null (unless already changed)
             if ($reportProject->getIdProject() === $this) {
                 $reportProject->setIdProject(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|IsFor[]
+     */
+    public function getIsFors(): Collection
+    {
+        return $this->isFors;
+    }
+
+    public function addIsFor(IsFor $isFor): self
+    {
+        if (!$this->isFors->contains($isFor)) {
+            $this->isFors[] = $isFor;
+            $isFor->setIdProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIsFor(IsFor $isFor): self
+    {
+        if ($this->isFors->removeElement($isFor)) {
+            // set the owning side to null (unless already changed)
+            if ($isFor->getIdProject() === $this) {
+                $isFor->setIdProject(null);
             }
         }
 

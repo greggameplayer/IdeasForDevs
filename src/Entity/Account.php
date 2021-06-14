@@ -94,12 +94,30 @@ class Account
      */
     private $reportProjects;
 
+    /**
+     * @ORM\OneToMany(targetEntity=IsFor::class, mappedBy="idAccount")
+     */
+    private $isFors;
+
+    /**
+     * @ORM\OneToMany(targetEntity=ReportUser::class, mappedBy="idReporter", orphanRemoval=true)
+     */
+    private $reporters;
+
+    /**
+     * @ORM\OneToMany(targetEntity=ReportUser::class, mappedBy="idReported", orphanRemoval=true)
+     */
+    private $reportedUsers;
+
     public function __construct()
     {
         $this->applies = new ArrayCollection();
         $this->commentaries = new ArrayCollection();
         $this->reportComments = new ArrayCollection();
         $this->reportProjects = new ArrayCollection();
+        $this->isFors = new ArrayCollection();
+        $this->reporters = new ArrayCollection();
+        $this->reportedUsers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -353,6 +371,96 @@ class Account
             // set the owning side to null (unless already changed)
             if ($reportProject->getIdAccount() === $this) {
                 $reportProject->setIdAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|IsFor[]
+     */
+    public function getIsFors(): Collection
+    {
+        return $this->isFors;
+    }
+
+    public function addIsFor(IsFor $isFor): self
+    {
+        if (!$this->isFors->contains($isFor)) {
+            $this->isFors[] = $isFor;
+            $isFor->setIdAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIsFor(IsFor $isFor): self
+    {
+        if ($this->isFors->removeElement($isFor)) {
+            // set the owning side to null (unless already changed)
+            if ($isFor->getIdAccount() === $this) {
+                $isFor->setIdAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ReportUser[]
+     */
+    public function getReporters(): Collection
+    {
+        return $this->reporters;
+    }
+
+    public function addReporter(ReportUser $reporter): self
+    {
+        if (!$this->reporters->contains($reporter)) {
+            $this->reporters[] = $reporter;
+            $reporter->setIdReporter($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReporter(ReportUser $reporter): self
+    {
+        if ($this->reporters->removeElement($reporter)) {
+            // set the owning side to null (unless already changed)
+            if ($reporter->getIdReporter() === $this) {
+                $reporter->setIdReporter(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ReportUser[]
+     */
+    public function getReportedUsers(): Collection
+    {
+        return $this->reportedUsers;
+    }
+
+    public function addReportedUser(ReportUser $reportedUser): self
+    {
+        if (!$this->reportedUsers->contains($reportedUser)) {
+            $this->reportedUsers[] = $reportedUser;
+            $reportedUser->setIdReported($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReportedUser(ReportUser $reportedUser): self
+    {
+        if ($this->reportedUsers->removeElement($reportedUser)) {
+            // set the owning side to null (unless already changed)
+            if ($reportedUser->getIdReported() === $this) {
+                $reportedUser->setIdReported(null);
             }
         }
 
