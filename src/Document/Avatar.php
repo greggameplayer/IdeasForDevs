@@ -16,22 +16,22 @@ class Avatar
     /** @MongoDB\File */
     private $file;
 
-    /** @MongoDB\String */
+    /** @MongoDB\Field(type="string") */
     private $filename;
 
-    /** @MongoDB\String */
+    /** @MongoDB\Field(type="string") */
     private $mimeType;
 
-    /** @MongoDB\Date */
+    /** @MongoDB\Field(type="date") */
     private $uploadDate;
 
-    /** @MongoDB\Int */
+    /** @MongoDB\Field(type="int") */
     private $length;
 
-    /** @MongoDB\Int */
+    /** @MongoDB\Field(type="int") */
     private $chunkSize;
 
-    /** @MongoDB\String */
+    /** @MongoDB\Field(type="string") */
     private $md5;
 
     public function getFile()
