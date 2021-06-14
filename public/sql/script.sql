@@ -8,7 +8,7 @@ CREATE TABLE Account(
    birthDate DATE,
    idMongo VARCHAR(500),
    subscribeDate DATETIME,
-   isActivated LOGICAL,
+   isActivated BIT,
    skills JSON,
    job JSON,
    PRIMARY KEY(idAccount)
@@ -49,7 +49,7 @@ CREATE TABLE Commentary(
 CREATE TABLE Apply(
    idAccount INT,
    idProject INT,
-   isAdmitted LOGICAL,
+   isAdmitted BIT,
    role VARCHAR(50),
    PRIMARY KEY(idAccount, idProject),
    FOREIGN KEY(idAccount) REFERENCES Account(idAccount) ON DELETE CASCADE,
@@ -59,7 +59,7 @@ CREATE TABLE Apply(
 CREATE TABLE isFor(
    idAccount INT,
    idProject INT,
-   evaluation LOGICAL,
+   evaluation BIT,
    PRIMARY KEY(idAccount, idProject),
    FOREIGN KEY(idAccount) REFERENCES Account(idAccount) ON DELETE CASCADE,
    FOREIGN KEY(idProject) REFERENCES Project(idProject) ON DELETE CASCADE
