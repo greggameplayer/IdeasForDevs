@@ -8,11 +8,11 @@ CREATE TABLE Account(
    birthDate DATE,
    idMongo VARCHAR(500),
    subscribeDate DATETIME,
-   isActivated BIT,
+   isActivated BOOLEAN,
    skills JSON,
    job JSON,
    PRIMARY KEY(idAccount)
-);
+)ENGINE=InnoDB;
 
 CREATE TABLE Project(
    idProject INT,
@@ -27,12 +27,12 @@ CREATE TABLE Project(
    idAccount INT NOT NULL,
    PRIMARY KEY(idProject),
    FOREIGN KEY(idAccount) REFERENCES Account(idAccount) ON DELETE CASCADE
-);
+)ENGINE=InnoDB;
 
 CREATE TABLE Skill(
    name VARCHAR(50),
    PRIMARY KEY(name)
-);
+)ENGINE=InnoDB;
 
 CREATE TABLE Commentary(
    idProject INT,
@@ -44,26 +44,26 @@ CREATE TABLE Commentary(
    UNIQUE(idAccount),
    FOREIGN KEY(idProject) REFERENCES Project(idProject) ON DELETE CASCADE,
    FOREIGN KEY(idAccount) REFERENCES Account(idAccount) ON DELETE CASCADE
-);
+)ENGINE=InnoDB;
 
 CREATE TABLE Apply(
    idAccount INT,
    idProject INT,
-   isAdmitted BIT,
+   isAdmitted BOOLEAN,
    role VARCHAR(50),
    PRIMARY KEY(idAccount, idProject),
    FOREIGN KEY(idAccount) REFERENCES Account(idAccount) ON DELETE CASCADE,
    FOREIGN KEY(idProject) REFERENCES Project(idProject) ON DELETE CASCADE
-);
+)ENGINE=InnoDB;
 
 CREATE TABLE isFor(
    idAccount INT,
    idProject INT,
-   evaluation BIT,
+   evaluation BOOLEAN,
    PRIMARY KEY(idAccount, idProject),
    FOREIGN KEY(idAccount) REFERENCES Account(idAccount) ON DELETE CASCADE,
    FOREIGN KEY(idProject) REFERENCES Project(idProject) ON DELETE CASCADE
-);
+)ENGINE=InnoDB;
 
 CREATE TABLE ReportProject(
    idAccount INT,
@@ -74,7 +74,7 @@ CREATE TABLE ReportProject(
    PRIMARY KEY(idAccount, idProject, dateReport),
    FOREIGN KEY(idAccount) REFERENCES Account(idAccount) ON DELETE CASCADE,
    FOREIGN KEY(idProject) REFERENCES Project(idProject) ON DELETE CASCADE
-);
+)ENGINE=InnoDB;
 
 CREATE TABLE ReportUser(
    idReporter INT,
@@ -85,7 +85,7 @@ CREATE TABLE ReportUser(
    PRIMARY KEY(idReporter, idReported, dateReport),
    FOREIGN KEY(idReporter) REFERENCES Account(idAccount) ON DELETE CASCADE,
    FOREIGN KEY(idReported) REFERENCES Account(idAccount) ON DELETE CASCADE
-);
+)ENGINE=InnoDB;
 
 CREATE TABLE ReportComment(
    idReporter INT,
@@ -98,4 +98,4 @@ CREATE TABLE ReportComment(
    PRIMARY KEY(idReporter, idProject, idReported, dateComment),
    FOREIGN KEY(idReporter) REFERENCES Account(idAccount),
    FOREIGN KEY(idProject, idReported, dateComment) REFERENCES Commentary(idProject, idAccount, dateComment)
-);
+)ENGINE=InnoDB;
