@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block javascripts %}<script src="{{ asset('js/registration.js') }}" defer></script>{% endblock %}
+
+{% block body %}
+    {% for flashError in app.flashes('verify_email_error') %}
+        <div class="alert alert-danger" role="alert">{{ flashError }}</div>
+    {% endfor %}
+
+    <div class="flex-column page-section justify-content-center mx-auto mt-5 w-75">
+        {{ form_start(registrationForm) }}
+        {{ form_row(registrationForm.avatar) }}
+        {{ form_row(registrationForm.firstname) }}
+        {{ form_row(registrationForm.lastname) }}
+        {{ form_row(registrationForm.birthDate) }}
+        {{ form_row(registrationForm.email) }}
+        {{ form_row(registrationForm.password) }}
+
+        <label for="skills" class="h3 ml-4 mb-0">Compétences :</label>
+        <div class="input-group">
+            <input id="skills" type="text" class="form-control" name="skills">
+            <div class="input-group-append">
+                <button id="skillsbtn" class="btn btn-primary" style="border-radius: 0 0.5rem 0.5rem 0;"><i class="fas fa-plus"></i></button>
+            </div>
+        </div>
+        <div id="skills_display" class="mt-2">
+
+        </div>
+
+        <label for="jobsSelect" class="h3 ml-4 mb-0">Métiers :</label>
+        <select id="jobsSelect" name="jobs" multiple class="form-select">
+
+        </select>
+
+        <button type="submit" class="btn btn-primary w-100 mt-5">S'inscrire</button>
+        {{ form_end(registrationForm) }}
+    </div>
+{% endblock %}
