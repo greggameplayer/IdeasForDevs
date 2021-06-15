@@ -44,6 +44,11 @@ class ReportComment
      */
     private $dateReport;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isTreated;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +110,18 @@ class ReportComment
     public function setDateReport(\DateTimeInterface $dateReport): self
     {
         $this->dateReport = $dateReport;
+
+        return $this;
+    }
+
+    public function getIsTreated(): ?bool
+    {
+        return $this->isTreated;
+    }
+
+    public function setIsTreated(bool $isTreated): self
+    {
+        $this->isTreated = $isTreated;
 
         return $this;
     }

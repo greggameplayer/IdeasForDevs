@@ -44,6 +44,11 @@ class ReportProject
      */
     private $description;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isTreated;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +110,18 @@ class ReportProject
     public function setDescription(string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getIsTreated(): ?bool
+    {
+        return $this->isTreated;
+    }
+
+    public function setIsTreated(bool $isTreated): self
+    {
+        $this->isTreated = $isTreated;
 
         return $this;
     }

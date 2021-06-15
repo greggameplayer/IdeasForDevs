@@ -29,20 +29,17 @@ class Apply
      */
     private $idProject;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $isAdmitted;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $role;
 
     /**
      * @ORM\Column(type="string", length=500, nullable=true)
      */
     private $description;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=RoleProject::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $roleProject;
 
     public function getId(): ?int
     {
@@ -73,30 +70,6 @@ class Apply
         return $this;
     }
 
-    public function getIsAdmitted(): ?bool
-    {
-        return $this->isAdmitted;
-    }
-
-    public function setIsAdmitted(bool $isAdmitted): self
-    {
-        $this->isAdmitted = $isAdmitted;
-
-        return $this;
-    }
-
-    public function getRole(): ?string
-    {
-        return $this->role;
-    }
-
-    public function setRole(string $role): self
-    {
-        $this->role = $role;
-
-        return $this;
-    }
-
     public function getDescription(): ?string
     {
         return $this->description;
@@ -105,6 +78,18 @@ class Apply
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getRoleProject(): ?RoleProject
+    {
+        return $this->roleProject;
+    }
+
+    public function setRoleProject(?RoleProject $roleProject): self
+    {
+        $this->roleProject = $roleProject;
 
         return $this;
     }

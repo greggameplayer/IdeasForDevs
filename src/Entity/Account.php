@@ -67,11 +67,6 @@ class Account
     /**
      * @ORM\Column(type="json", nullable=true)
      */
-    private $job = [];
-
-    /**
-     * @ORM\Column(type="json", nullable=true)
-     */
     private $role = [];
 
     /**
@@ -110,6 +105,11 @@ class Account
      */
     private $reportProjects;
 
+    /**
+     * @ORM\OneToMany(targetEntity=JobsAccount::class, mappedBy="account", orphanRemoval=true)
+     */
+    private $jobsAccounts;
+
 
     public function __construct()
     {
@@ -120,6 +120,7 @@ class Account
         $this->reporteds = new ArrayCollection();
         $this->reportComments = new ArrayCollection();
         $this->reportProjects = new ArrayCollection();
+        $this->jobsAccounts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -231,18 +232,6 @@ class Account
     public function setSkills(?array $skills): self
     {
         $this->skills = $skills;
-
-        return $this;
-    }
-
-    public function getJob(): ?array
-    {
-        return $this->job;
-    }
-
-    public function setJob(?array $job): self
-    {
-        $this->job = $job;
 
         return $this;
     }
@@ -467,6 +456,36 @@ class Account
             // set the owning side to null (unless already changed)
             if ($reportProject->getAccount() === $this) {
                 $reportProject->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|JobsAccount[]
+     */
+    public function getJobsAccounts(): Collection
+    {
+        return $this->jobsAccounts;
+    }
+
+    public function addJobsAccount(JobsAccount $jobsAccount): self
+    {
+        if (!$this->jobsAccounts->contains($jobsAccount)) {
+            $this->jobsAccounts[] = $jobsAccount;
+            $jobsAccount->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeJobsAccount(JobsAccount $jobsAccount): self
+    {
+        if ($this->jobsAccounts->removeElement($jobsAccount)) {
+            // set the owning side to null (unless already changed)
+            if ($jobsAccount->getAccount() === $this) {
+                $jobsAccount->setAccount(null);
             }
         }
 
