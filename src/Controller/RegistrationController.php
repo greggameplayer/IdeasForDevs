@@ -52,9 +52,8 @@ class RegistrationController extends AbstractController
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // encode the plain password
-            $user->setPassword(
+        if ($request->isMethod('POST')) {
+                /*$user->setPassword(
                 $passwordEncoder->encodePassword(
                     $user,
                     $form->get('plainPassword')->getData()
@@ -72,10 +71,9 @@ class RegistrationController extends AbstractController
                     ->to($user->getEmail())
                     ->subject('Please Confirm your Email')
                     ->htmlTemplate('registration/confirmation_email.html.twig')
-            );
-            // do anything else you need here, like send an email
+            );*/
 
-            return $this->redirectToRoute('homepage');
+                return $this->json(["message" => "good !", "request" => $request]);
         }
 
         return $this->render('registration/register.html.twig', [
