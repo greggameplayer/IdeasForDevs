@@ -53,7 +53,16 @@ window.addEventListener("load", (event) => {
             method: 'POST',
             body: data
         })
-            .then((response) => response.json())
-            .then((json) => console.log(json));
+            .then((response) => response.text())
+            .then((json) => {
+                if(typeof json.error != "undefined") {
+                    document.querySelector("#errorAlert").classList.remove("d-none");
+                    document.querySelector("#errorAlert").innerHTML = json.error;
+                } else {
+                    if (!document.querySelector("#errorAlert").classList.contains("d-none")){
+                        document.querySelector("#errorAlert").classList.add("d-none");
+                    }
+                }
+            });
     })
 })

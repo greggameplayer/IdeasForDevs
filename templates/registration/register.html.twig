@@ -18,6 +18,7 @@
     {% endfor %}
 
     <div class="flex-column page-section justify-content-center mx-auto mt-5 w-75">
+        <div class="alert alert-danger d-none" role="alert" id="errorAlert"></div>
         {{ form_start(registrationForm) }}
         {{ form_row(registrationForm.avatar) }}
         {{ form_row(registrationForm.firstname) }}

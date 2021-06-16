@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Document\Avatar;
 use App\Entity\Account;
 use App\Entity\Job;
 use App\Entity\Skill;
@@ -9,8 +10,12 @@ use App\Form\RegistrationFlow;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
 use App\Repository\AccountRepository;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use MongoDB\GridFS\ReadableStream;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
@@ -45,18 +50,36 @@ class RegistrationController extends AbstractController
 
     /**
      * @Route("/register", name="app_register")
+     * @throws \Doctrine\ODM\MongoDB\MongoDBException
      */
-    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder): Response
+    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, DocumentManager $dm)
     {
+
         $user = new Account();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
         if ($request->isMethod('POST')) {
+
+            if($request->get("password")["first"] != $request->get("password")["second"]) {
+                return $this->json(["error" => "Les mot de passe doivent être identique !"]);
+            } else if(strlen($request->get("password")["first"]) < 8) {
+                return $this->json(["error" => "Votre mot de passe doit faire au moins 8 caractères !"]);
+            }
+
+            /** @var UploadedFile $document */
+            $document = $request->files->get("avatar");
+            /** @var resource $stream */
+            $stream = fopen($document->getPathname(), 'r');
+            $id = $dm->getDocumentBucket(Avatar::class)->uploadFromStream($document->getClientOriginalName(), $stream);
+            fclose($stream);
+
+
+
                 /*$user->setPassword(
                 $passwordEncoder->encodePassword(
                     $user,
-                    $form->get('plainPassword')->getData()
+                    $form->get('password')->getData()
                 )
             );
 
@@ -72,8 +95,7 @@ class RegistrationController extends AbstractController
                     ->subject('Please Confirm your Email')
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );*/
-
-                return $this->json(["message" => "good !", "request" => $request]);
+            return $this->json(["message" => "good !", "avatarId" => $id]);
         }
 
         return $this->render('registration/register.html.twig', [
