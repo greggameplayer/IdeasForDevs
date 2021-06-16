@@ -47,4 +47,19 @@ class AccountRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function detailsAdminProjectForEachAdmin($id) :array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT account.firstname, account.lastname, account.id_mongo, account.subscribe_date, account.skills, account.role, job.name
+        FROM account INNER JOIN jobs_account ON account.id = jobs_account.account_id 
+            INNER JOIN job ON jobs_account.job_id = job.id
+        WHERE account.id = :id";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['id' => $id])->fetchAllAssociative()[0];
+    }
 }

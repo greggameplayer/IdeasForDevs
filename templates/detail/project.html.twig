@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello DetailController!{% endblock %}
+
+{% block body %}
+
+<div class="flex-column page-section justify-content-center mx-auto mt-5 w-75">
+    <div> Projet:</div>
+    <br>
+    <div>{{ detailsProject.name }}</div>
+    <!-- Revoir affichage Image (traitement dans le back)-->
+    <div>{{ detailsProject.id_mongo }}</div>
+
+    <div>{{ detailsProject.description }}</div>
+    <div>{{ detailsProject.date_creation|date('Y-m-d H') }} h {{ detailsProject.date_creation|date('i') }}</div>
+    <div>{{ detailsProject.status }}</div>
+    <!-- Revoir affichage JSON-->
+    <div>{{ detailsProject.skills_needed }}</div>
+    <div>{{ detailsProject.job_needed }}</div>
+
+    <div>{{ countFor }}</div>
+    <div>{{ countAgainst }}</div>
+    <br>
+    <br>
+    <div> Commentaires:</div>
+    {% for commentary in commentaries %}
+        <div>{{ commentary.id_mongo }}</div>
+        <div>{{ commentary.firstname }}</div>
+        <div>{{ commentary.lastname }}</div>
+        <div>{{ commentary.date_comment|date('Y-m-d H')}} h {{ commentary.date_comment|date('i') }}</div>
+        <div>{{ commentary.comment }}</div>
+    {% endfor %}
+    <br>
+    <br>
+    <div>Administrateur</div>
+    {% for i in 0..detailsAdminProjectForEachAdmin|length-1 %}
+       <div>{{ detailsAdminProjectForEachAdmin[i].id_mongo }}</div>
+       <div>{{ detailsAdminProjectForEachAdmin[i].firstname }}</div>
+       <div>{{ detailsAdminProjectForEachAdmin[i].lastname }}</div>
+       <div>{{ detailsAdminProjectForEachAdmin[i].subscribe_date }}</div>
+       <div>{{ detailsAdminProjectForEachAdmin[i].skills }}</div>
+       <div>{{ detailsAdminProjectForEachAdmin[i].name }}</div>
+        <div>{{ countProjectAsAdminForEachAdmin[i] }}</div>
+        <div>{{ countProjectParticipationForEachAdmin[i] }}</div>
+        <div>{{ countProjectSuccessfullForEachAdmin[i] }}</div>
+
+   {% endfor %}
+
+
+
+</div>
+{% endblock %}

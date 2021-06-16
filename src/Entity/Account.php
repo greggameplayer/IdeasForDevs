@@ -125,6 +125,7 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
     private $projects;
 
 
+
     public function __construct()
     {
         $this->applies = new ArrayCollection();

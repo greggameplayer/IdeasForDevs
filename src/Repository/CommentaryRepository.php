@@ -47,4 +47,19 @@ class CommentaryRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function GetCommentariesAndUser($id)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT commentary.comment, commentary.date_comment, account.firstname, account.lastname, account.id_mongo
+        FROM commentary INNER JOIN account ON commentary.id_account_id = account.id
+        WHERE commentary.id_project_id = :id
+        ";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['id' => $id])->fetchAllAssociative();
+    }
+
 }

@@ -47,4 +47,69 @@ class ApplyRepository extends ServiceEntityRepository
         ;
     }
     */
+
+
+    public function countProjectAsAdmin($id)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT COUNT(apply.id_project_id)
+        FROM apply INNER JOIN role_project ON apply.role_project_id = role_project.id
+        WHERE role_project.name = 'Administrateur'
+        AND apply.id_account_id = :id";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['id' => $id])->fetchOne();
+    }
+
+    public function IdOfAdmins($id) :array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT apply.id_account_id
+        FROM apply INNER JOIN role_project ON apply.role_project_id = role_project.id
+        INNER JOIN account ON apply.id_account_id = account.id
+        WHERE apply.id_project_id = :id
+        AND role_project.name = 'Administrateur'
+        AND account.is_activated = 1
+        ";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['id' => $id])->fetchFirstColumn();
+    }
+
+    public function countProjectParticipation($id)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT COUNT(apply.id_project_id)
+        FROM apply
+        WHERE apply.id_account_id = :id";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['id' => $id])->fetchOne();
+    }
+
+    public function countProjectSuccessfull($id)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT COUNT(apply.id_project_id)
+        FROM apply INNER JOIN Project ON apply.id_project_id = project.id INNER JOIN status ON project.status_id = status.id
+        WHERE apply.id_account_id = :id
+        AND status.status = 'Abouti'";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['id' => $id])->fetchOne();
+    }
+
+
 }

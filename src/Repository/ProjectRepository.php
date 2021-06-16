@@ -58,5 +58,18 @@ class ProjectRepository extends ServiceEntityRepository
         ;
     }
 
+    public function detailsProject($id) :array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT project.name, project.repo, project.description, project.date_creation, project.id_mongo, project.skills_needed, project.job_needed, status.status
+        FROM project INNER JOIN status ON project.status_id = status.id
+        WHERE project.id = :id";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['id' => $id])->fetchAllAssociative()[0];
+    }
 
 }

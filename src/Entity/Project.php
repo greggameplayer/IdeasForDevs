@@ -89,6 +89,7 @@ class Project
      */
     private $account;
 
+
     public function __construct()
     {
         $this->applies = new ArrayCollection();
@@ -341,7 +342,5 @@ class Project
     public function setAccount(?Account $account): self
     {
         $this->account = $account;
-
-        return $this;
     }
 }

@@ -76,4 +76,34 @@ class IsForRepository extends ServiceEntityRepository
 
         return $stmt->executeQuery(["idProject" => $idProject, "idAccount" => $idUser])->fetchOne();
     }
+
+    public function countVotesFor($id)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT COUNT(is_for.evaluation)
+        FROM is_for
+        WHERE is_for.id_project_id = :id
+        AND is_for.evaluation = 1
+        ";
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['id' => $id])->fetchOne();
+    }
+
+    public function countVotesAgainst($id)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT COUNT(is_for.evaluation)
+        FROM is_for
+        WHERE is_for.id_project_id = :id
+        AND is_for.evaluation = 0
+        ";
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['id' => $id])->fetchOne();
+    }
 }
