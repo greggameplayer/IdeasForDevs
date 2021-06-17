@@ -60,7 +60,6 @@ class ProjectController extends AbstractController
      */
     public function allProjects(Request $request, PaginatorInterface $paginator): Response
     {
-        //TODO implement $this->getUser()
         if(isset($_GET['search'])){
             $data = $this->getDoctrine()->getRepository(Project::class)->findByName($_GET['search']);
         }
@@ -68,17 +67,11 @@ class ProjectController extends AbstractController
             $data = $this->getDoctrine()->getRepository(Project::class)->findAll();
         }
 
-        //foreach($data as $try){
-        //    foreach($try->getIsFors() as $notation){
-        //        if($notation->getEvaluation()){
-        //            
-        //        }
-        //    }
-        //}
 
         $projects = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
+
             2
         );
 
@@ -115,8 +108,6 @@ class ProjectController extends AbstractController
                 array_push($projectsNotation, [0, 0, 0]);
             }
         }
-
-        dump($projects, $projectsNotation);
         
         return $this->render('project/index.html.twig', [
             'projects' => $projects,
@@ -152,7 +143,6 @@ class ProjectController extends AbstractController
 
             //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
         }
-
 
         return $this->render('project/createProject.html.twig', [
             'form' => $form->createView(),
@@ -248,7 +238,6 @@ class ProjectController extends AbstractController
             }
     
             $creator = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]);
-            dump($creator,$members, $admin, $waiting, $rejected);
     
             return $this->render('test.html.twig', [
                 'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
@@ -259,8 +248,6 @@ class ProjectController extends AbstractController
                 'rejected'=>$rejected
             ]); 
         }
-        
-        dump("Vous n'avez pas les droits");
     }
 
 
@@ -293,8 +280,6 @@ class ProjectController extends AbstractController
 
             //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
         }
-
-        dump($project);
 
         return $this->render('project/applyProject.html.twig', [
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
@@ -330,7 +315,6 @@ class ProjectController extends AbstractController
                 //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
             }
         }
-        dump("You don't have the right to delete this project");       
         
     }
 

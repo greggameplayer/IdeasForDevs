@@ -89,7 +89,6 @@ class Project
      */
     private $account;
 
-
     public function __construct()
     {
         $this->applies = new ArrayCollection();
