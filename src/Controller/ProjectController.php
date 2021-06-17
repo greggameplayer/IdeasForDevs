@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Knp\Component\Pager\PaginatorInterface;
 use App\Entity\Project;
 use App\Form\ProjectType;
+use DateTime;
 
 class ProjectController extends AbstractController
 {
@@ -57,18 +58,59 @@ class ProjectController extends AbstractController
      */
     public function allProjects(Request $request, PaginatorInterface $paginator): Response
     {
-        $data = $this->getDoctrine()->getRepository(Project::class)->findAll();
+        //TODO implement $this->getUser()
+        if(isset($_GET['search'])){
+            $data = $this->getDoctrine()->getRepository(Project::class)->findByName($_GET['search']);
+        }
+        else{
+            $data = $this->getDoctrine()->getRepository(Project::class)->findAll();
+        }
 
         $projects = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
-            10
+            2
         );
 
-        dump($projects);
+
+        $projectsNotation =[];
+
+        foreach($projects as $project){
+            //To get creator of the project
+            $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]);
+            $project->setAccount($account);
+            //To get like and dislike
+            $test = True;
+            $isFors = $project->getIsFors();
+            foreach ($isFors as $like){
+                $noted = 0;
+                $likes = 0;
+                $dislikes = 0;
+                if($like->getEvaluation()){
+                    $likes++;
+                }
+                else{
+                    $dislikes++;
+                }
+                if($like->getIdAccount()->getId() == 1 && $like->getEvaluation()){
+                    $noted = 1;
+                }
+                if($like->getIdAccount()->getId() == 1 && !$like->getEvaluation()){
+                    $noted = 2;
+                }
+                array_push($projectsNotation, [$noted, $likes, $dislikes]);
+                $test = False;
+            }
+            if($test){
+                array_push($projectsNotation, [0, 0, 0]);
+            }
+        }
+
+        dump($projects, $projectsNotation);
         
-        return $this->render('test.html.twig', [
+        return $this->render('project/index.html.twig', [
             'projects' => $projects,
+            'notations' => $projectsNotation,
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0])
         ]);
     }
@@ -80,7 +122,15 @@ class ProjectController extends AbstractController
      */
     public function createProject(Request $request): Response
     {
+        //TODO implement redirection after the creation of the project
+        date_default_timezone_set('Europe/Paris');
+        $currentDate = new DateTime();
+
         $project = new Project;
+        $project->setDateCreation($currentDate);
+        $project->setStatus(0);
+        $project->setAccount($this->getUser());
+
         $form = $this->createForm(ProjectType::class, $project);
         $form->handleRequest($request);
         
@@ -89,12 +139,13 @@ class ProjectController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($project);
             $em->flush();
+            dump($project);
 
             //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
         }
 
 
-        return $this->render('test.html.twig', [
+        return $this->render('project/createProject.html.twig', [
             'form' => $form->createView(),
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0])
         ]);
@@ -107,7 +158,7 @@ class ProjectController extends AbstractController
      */
     public function updateProject(Request $request, $id): Response
     {
-
+        //TODO implement redirection after the creation of the project
         $project = $this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $id]);
         if($this->isAdmin){
             $form = $this->createForm(ProjectType::class, $project);
@@ -200,7 +251,7 @@ class ProjectController extends AbstractController
             ]); 
         }
         
-        $info = "Vous n'avez pas les "
+        dump("Vous n'avez pas les droits");
     }
 
 
@@ -212,22 +263,20 @@ class ProjectController extends AbstractController
     public function applyToProject(Request $request, $id): Response
     { 
         $apply = new Apply;
+        $roleProject = $this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => 1]);
         $project=$this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $id]);
 
-        $form = $this->createForm(ProjectType::class, $apply);
-        $form->handleRequest($request);
-        
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($project);
-            $em->flush();
+        $apply->setIdProject($project);
+        $apply->setIdAccount($this->getUser());
+        $apply->setRoleProject($roleProject);
 
-            //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
-        }
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($apply);
+        $em->flush();
+
 
 
         return $this->render('test.html.twig', [
-            'form' => $form->createView(),
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0])
         ]);
     

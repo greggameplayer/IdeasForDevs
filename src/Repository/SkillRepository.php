@@ -47,4 +47,15 @@ class SkillRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findAllChoice()
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "SELECT skill.name FROM `skill`";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery()->fetchAllAssociative();
+    }
 }

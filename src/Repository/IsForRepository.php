@@ -47,4 +47,33 @@ class IsForRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function findOneByLike($idUser, $idProject)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "SELECT is_for.id
+               FROM is_for
+               WHERE is_for.id_account_id = :idAccount
+               AND is_for.evaluation = 1
+               AND is_for.id_project_id = :idProject";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(["idProject" => $idProject, "idAccount" => $idUser])->fetchOne();
+    }
+
+    public function findOneByDislike($idUser, $idProject)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "SELECT is_for.id
+               FROM is_for
+               WHERE is_for.id_account_id = :idAccount
+               AND is_for.evaluation = 0
+               AND is_for.id_project_id = :idProject";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(["idProject" => $idProject, "idAccount" => $idUser])->fetchOne();
+    }
 }

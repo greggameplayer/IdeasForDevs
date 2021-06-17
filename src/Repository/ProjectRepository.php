@@ -47,4 +47,16 @@ class ProjectRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findByName($value)
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.name LIKE :val')
+            ->setParameter('val', "%$value%")
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+
 }
