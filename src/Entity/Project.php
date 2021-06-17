@@ -84,6 +84,11 @@ class Project
      */
     private $reportProjects;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Account::class, inversedBy="projects")
+     */
+    private $account;
+
     public function __construct()
     {
         $this->applies = new ArrayCollection();
@@ -324,6 +329,18 @@ class Project
                 $reportProject->setProject(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAccount(): ?Account
+    {
+        return $this->account;
+    }
+
+    public function setAccount(?Account $account): self
+    {
+        $this->account = $account;
 
         return $this;
     }
