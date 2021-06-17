@@ -67,11 +67,9 @@ class ProjectController extends AbstractController
             $data = $this->getDoctrine()->getRepository(Project::class)->findAll();
         }
 
-
         $projects = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
-
             2
         );
 
@@ -143,7 +141,6 @@ class ProjectController extends AbstractController
 
             //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
         }
-
         return $this->render('project/createProject.html.twig', [
             'form' => $form->createView(),
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0])
@@ -196,9 +193,6 @@ class ProjectController extends AbstractController
             $em->flush();
         }
 
-        dump("You don't have the right to delete this project");
-
-                
         return $this->render('test.html.twig', [
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0])
         ]);
@@ -277,19 +271,15 @@ class ProjectController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($apply);
             $em->flush();
-
-            //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
         }
 
         return $this->render('project/applyProject.html.twig', [
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
             'project' => $project,
             'form' => $form->createView()
+
         ]);
-    
-    
-    
-    
+
     }
 
     /**
