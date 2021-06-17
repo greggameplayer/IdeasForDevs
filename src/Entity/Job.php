@@ -24,14 +24,8 @@ class Job
      */
     private $name;
 
-    /**
-     * @ORM\OneToMany(targetEntity=JobsAccount::class, mappedBy="job", orphanRemoval=true)
-     */
-    private $jobsAccounts;
-
     public function __construct()
     {
-        $this->jobsAccounts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -47,36 +41,6 @@ class Job
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|JobsAccount[]
-     */
-    public function getJobsAccounts(): Collection
-    {
-        return $this->jobsAccounts;
-    }
-
-    public function addJobsAccount(JobsAccount $jobsAccount): self
-    {
-        if (!$this->jobsAccounts->contains($jobsAccount)) {
-            $this->jobsAccounts[] = $jobsAccount;
-            $jobsAccount->setJob($this);
-        }
-
-        return $this;
-    }
-
-    public function removeJobsAccount(JobsAccount $jobsAccount): self
-    {
-        if ($this->jobsAccounts->removeElement($jobsAccount)) {
-            // set the owning side to null (unless already changed)
-            if ($jobsAccount->getJob() === $this) {
-                $jobsAccount->setJob(null);
-            }
-        }
 
         return $this;
     }

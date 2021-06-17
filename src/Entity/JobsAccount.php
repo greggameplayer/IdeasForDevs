@@ -24,7 +24,7 @@ class JobsAccount
     private $account;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Job::class, inversedBy="jobsAccounts")
+     * @ORM\ManyToOne(targetEntity=Job::class)
      * @ORM\JoinColumn(nullable=false)
      */
     private $job;

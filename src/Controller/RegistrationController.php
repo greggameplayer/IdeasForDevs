@@ -5,31 +5,42 @@ namespace App\Controller;
 use App\Document\Avatar;
 use App\Entity\Account;
 use App\Entity\Job;
+use App\Entity\JobsAccount;
 use App\Entity\Skill;
-use App\Form\RegistrationFlow;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
 use App\Repository\AccountRepository;
+use DateTime;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\MongoDBException;
+use MongoDB\BSON\ObjectId;
 use MongoDB\GridFS\ReadableStream;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 class RegistrationController extends AbstractController
 {
     private $emailVerifier;
 
-    public function __construct(EmailVerifier $emailVerifier)
+    private $filesystem;
+
+    public function __construct(EmailVerifier $emailVerifier, Filesystem $filesystem)
     {
         $this->emailVerifier = $emailVerifier;
+        $this->filesystem = $filesystem;
     }
 
     /**
@@ -50,41 +61,74 @@ class RegistrationController extends AbstractController
 
     /**
      * @Route("/register", name="app_register")
-     * @throws \Doctrine\ODM\MongoDB\MongoDBException
+     * @throws MongoDBException
+     * @throws \Exception
      */
     public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, DocumentManager $dm)
     {
-
         $user = new Account();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
         if ($request->isMethod('POST')) {
 
-            if($request->get("password")["first"] != $request->get("password")["second"]) {
-                return $this->json(["error" => "Les mot de passe doivent être identique !"]);
-            } else if(strlen($request->get("password")["first"]) < 8) {
-                return $this->json(["error" => "Votre mot de passe doit faire au moins 8 caractères !"]);
-            }
-
             /** @var UploadedFile $document */
             $document = $request->files->get("avatar");
+
+            if($this->getDoctrine()->getRepository(Account::class)->findOneBy(["email" => $request->get("email")]) != null) {
+                $this->filesystem->remove($document->getPathname());
+                return $this->json(["error" => "L'email est déjà utilisé !"]);
+            } else if($request->get("password")["first"] != $request->get("password")["second"]) {
+                $this->filesystem->remove($document->getPathname());
+                return $this->json(["error" => "Les mot de passe doivent être identique !"]);
+            } else if(strlen($request->get("password")["first"]) < 8) {
+                $this->filesystem->remove($document->getPathname());
+                return $this->json(["error" => "Votre mot de passe doit faire au moins 8 caractères !"]);
+            } else if(!in_array($document->guessExtension(), ["png", "jpg", "jpeg", "gif"])) {
+                $this->filesystem->remove($document->getPathname());
+                return $this->json(["error" => "Le format du fichier pour l'avatar que vous avez envoyé n'est pas supporté !"]);
+            } else if($document->getSize() > 2000000) {
+                $this->filesystem->remove($document->getPathname());
+                return $this->json(["error" => "Votre fichier avatar pése plus de 2 Mo !"]);
+            }
+
             /** @var resource $stream */
             $stream = fopen($document->getPathname(), 'r');
+
+            /** @var ObjectId $id */
             $id = $dm->getDocumentBucket(Avatar::class)->uploadFromStream($document->getClientOriginalName(), $stream);
             fclose($stream);
 
+            $this->filesystem->remove($document->getPathname());
 
+            $user = new Account();
 
-                /*$user->setPassword(
+            $user->setPassword(
                 $passwordEncoder->encodePassword(
                     $user,
-                    $form->get('password')->getData()
+                    $request->get('password')['first']
                 )
             );
 
+            $user->setBirthDate(new DateTime($request->get("birthDate")));
+            $user->setEmail($request->get("email"));
+            $user->setFirstname($request->get("firstname"));
+            $user->setLastname($request->get("lastname"));
+            $user->setRoles(["ROLE_USER"]);
+            $user->setSubscribeDate(new DateTime());
+            $user->setSkills(json_decode($request->get("skills")));
+            $user->setIdMongo($id->serialize());
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($user);
+
+            foreach(json_decode($request->get("jobs")) as $job) {
+                $jobobj = new JobsAccount();
+                $jobobj->setAccount($user);
+                $jobobj->setJob($this->getDoctrine()->getRepository(Job::class)->find($job));
+                $entityManager->persist($jobobj);
+            }
+
             $entityManager->flush();
 
             // generate a signed url and email it to the user
@@ -94,7 +138,8 @@ class RegistrationController extends AbstractController
                     ->to($user->getEmail())
                     ->subject('Please Confirm your Email')
                     ->htmlTemplate('registration/confirmation_email.html.twig')
-            );*/
+            );
+
             return $this->json(["message" => "good !", "avatarId" => $id]);
         }
 
