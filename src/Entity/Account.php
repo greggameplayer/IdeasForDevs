@@ -6,11 +6,15 @@ use App\Repository\AccountRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=AccountRepository::class)
+ * @UniqueEntity(fields={"email"}, message="There is already an account with this email")
  */
-class Account
+class Account implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
@@ -53,11 +57,6 @@ class Account
      * @ORM\Column(type="datetime")
      */
     private $subscribeDate;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $isActivated;
 
     /**
      * @ORM\Column(type="json", nullable=true)
@@ -109,6 +108,11 @@ class Account
      * @ORM\OneToMany(targetEntity=JobsAccount::class, mappedBy="account", orphanRemoval=true)
      */
     private $jobsAccounts;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isVerified = false;
 
 
     public function __construct()
@@ -212,18 +216,6 @@ class Account
         return $this;
     }
 
-    public function getIsActivated(): ?bool
-    {
-        return $this->isActivated;
-    }
-
-    public function setIsActivated(bool $isActivated): self
-    {
-        $this->isActivated = $isActivated;
-
-        return $this;
-    }
-
     public function getSkills(): ?array
     {
         return $this->skills;
@@ -236,12 +228,12 @@ class Account
         return $this;
     }
 
-    public function getRole(): ?array
+    public function getRoles(): ?array
     {
         return $this->role;
     }
 
-    public function setRole(?array $role): self
+    public function setRoles(?array $role): self
     {
         $this->role = $role;
 
@@ -492,4 +484,40 @@ class Account
         return $this;
     }
 
+    public function getSalt()
+    {
+        // TODO: Implement getSalt() method.
+    }
+
+    public function eraseCredentials()
+    {
+        // TODO: Implement eraseCredentials() method.
+    }
+
+    public function getUsername(): string
+    {
+        return (string) $this->getEmail();
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): self
+    {
+        $this->isVerified = $isVerified;
+
+        return $this;
+    }
 }
