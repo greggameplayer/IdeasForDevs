@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript" src="{{ asset('js/bootstrap-multiselect.js') }}" defer></script>
+    <script src="{{ asset('js/profile.js') }}" defer></script>
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/bootstrap-multiselect.css') }}" type="text/css"/>
+    <link href="{{ asset('css/profile.css') }}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{{ asset('css/breakpointWidth.css') }}">
+{% endblock %}
+
+{% block body %}
+    <style>
+        .circular--landscape {
+            display: inline-block;
+            position: relative;
+            width: 200px;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+    </style>
+<div class="page-section pb-0">
+    <div class="d-flex flex-column mx-3">
+        <div class="d-flex flex-row justify-content-around flex-wrap">
+            <div class="card d-flex flex-column mt-4 w-md-45 w-lg-45 w-xl-45" style="height: 50%;">
+                <div class="card-title text-center display-3">
+                    Avatar
+                </div>
+                <div class="card-body d-flex flex-column align-self-center">
+                    <div class="circular--landscape align-self-center" style="max-height: 25%;">
+                        <img src="{{ asset('images/noIMG.jpg') }}" alt="avatar" style="object-fit: cover; height: 100%; width: 100%;"/>
+                    </div>
+                    <form name="avatarform" id="avatarform" method="post" enctype="multipart/form-data" class="mt-5">
+                        <input type="file" id="avatarfile" name="avatar" class="form-control" accept="image/png, image/jpg, image/jpeg, image/gif" required/>
+                        <button type="submit" class="btn btn-primary w-100 mt-3">Envoyer</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card d-flex flex-column mt-4 w-md-50 w-lg-50 w-xl-50" style="height: 50%;">
+                <div class="card-title text-center display-3 p-2">
+                    Informations personnelles
+                </div>
+                <div class="card-body d-flex flex-column align-self-center w-100">
+                    <form name="infosform" id="infosform" method="post" class="mt-5">
+                        <label for="firstname" class="h3 ml-4 mb-0">Prénom :</label>
+                        <input type="text" id="firstname" name="firstname" class="form-control" required>
+
+                        <label for="lastname" class="h3 ml-4 mb-0 mt-2">Nom :</label>
+                        <input type="text" id="lastname" name="lastname" class="form-control" required>
+
+                        <label for="birthDate" class="h3 ml-4 mb-0 mt-2">Date de naissance :</label>
+                        <input type="date" id="birthDate" name="birthDate" class="form-control" required>
+
+                        <label for="jobsSelect" class="h3 ml-4 mb-0 mt-2">Métiers :</label>
+                        <div>
+                            <select id="jobsSelect" name="jobs" multiple class="d-none">
+
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mt-5">Mettre à jour</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-row justify-content-around flex-wrap">
+            <div class="card d-flex flex-column mt-4 w-md-45 w-lg-45 w-xl-45" style="height: 50%; min-width: 28.3em;">
+                <div class="card-title text-center display-3 p-2">
+                    Compétences
+                </div>
+                <div class="card-body d-flex flex-column align-self-center w-100">
+                    <div class="input-group">
+                        <input id="skills" type="text" class="form-control" name="skills">
+                        <div class="input-group-append">
+                            <button id="skillsbtn" class="btn btn-primary" style="border-radius: 0 0.5rem 0.5rem 0;"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <div id="skills_display" class="mt-2 card">
+                        <ul class="list-group list-group-flush">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card d-flex flex-column mt-4 w-md-50 w-lg-50 w-xl-50" style="height: 50%;">
+                <div class="card-title text-center display-3 p-2">
+                    Mot de passe
+                </div>
+                <div class="card-body d-flex flex-column align-self-center w-100">
+                    <form name="mdpform" id="mdpform" method="post" class="mt-5">
+                        <label for="oldpassword" class="h3 ml-4 mb-0">Votre ancien mot de passe :</label>
+                        <input type="password" id="oldpassword" name="oldpassword" autocomplete="new-password" class="form-control" required>
+                        <label for="newpassword" class="h3 ml-4 mb-0 mt-2">Votre nouveau mot de passe :</label>
+                        <input type="password" id="newpassword" name="newpassword" autocomplete="new-password" class="form-control" required>
+                        <label for="confirmpassword" class="h3 ml-4 mb-0 mt-2">Confirmation du nouveau mot de passe :</label>
+                        <input type="password" id="confirmpassword" name="confirmpassword" autocomplete="new-password" class="form-control" required>
+                        <button type="submit" class="btn btn-primary w-100 mt-5">Mettre à jour</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
