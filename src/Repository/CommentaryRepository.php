@@ -52,9 +52,10 @@ class CommentaryRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = "
-        SELECT commentary.comment, commentary.date_comment, account.firstname, account.lastname, account.id_mongo
+        SELECT commentary.comment, commentary.date_comment, account.firstname, account.lastname, account.id_mongo, account.id
         FROM commentary INNER JOIN account ON commentary.id_account_id = account.id
         WHERE commentary.id_project_id = :id
+        ORDER BY commentary.date_comment DESC
         ";
 
         $stmt = $conn->prepare($sql);

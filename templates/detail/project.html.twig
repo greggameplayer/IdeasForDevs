@@ -15,16 +15,17 @@
     </style>
 
     <div class="flex-column page-section">
-        <div id="project" class="d-flex flex-row flex-wrap">
+        <div class="d-flex flex-row flex-wrap">
             <div class="justify-content-center d-flex flex-column"
                  style="max-width: 40em; min-width: 20em; margin: 2em">
                 {% if detailsProject.id_mongo is not null %}
                     <!-- Revoir affichage Image (traitement dans le back)-->
                     <div>{{ detailsProject.id_mongo }}</div>
                 {% else %}
-                    <img src="{{ asset('images/noIMG.jpg') }}" style="object-fit: cover">
+                    <img src="{{ asset('images/noIMG.jpg') }}" style="object-fit: cover"
+                         alt="Erreur de chargement de l'image">
                 {% endif %}
-                <div id="votes" class="d-flex flex-row justify-content-center w-100 border mt-3">
+                <div class="d-flex flex-row justify-content-center w-100 border mt-3">
                     <div class="d-flex flex-column mx-auto justify-content-center text-center">
                         <h6>Vote POUR</h6>
                         <p><u>{{ countFor }}</u></p>
@@ -34,7 +35,6 @@
                         <p><u>{{ countAgainst }}</u></p>
                     </div>
                 </div>
-
             </div>
             <div class="d-flex flex-column border justify-content-center"
                  style="max-width: 70em; min-width: 10em; margin: 2em">
@@ -68,8 +68,6 @@
                 </div>
             </div>
         </div>
-
-
         <div class="d-flex flex-column mt-3">
             <h2 class="mx-3"><u>Administrateur(s):</u></h2>
             {% for i in 0..detailsAdminProjectForEachAdmin|length-1 %}
@@ -81,7 +79,7 @@
                         {% else %}
                             <div class="circular--landscape">
                                 <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
-                                     style="object-fit: cover">
+                                     style="object-fit: cover" alt="Erreur de chargement de l'image">
                             </div>
                         {% endif %}
                     </div>
@@ -122,44 +120,62 @@
                     </div>
                 </div>
             {% endfor %}
-
-
-            <div class="d-flex flex-column mt-3 border" style=" margin: 2em;">
-                <h2 class="mx-3"><u>Commentaires(s):</u></h2>
+            <div class="d-flex flex-column mt-3" style=" margin: 2em;">
+                <h2 class="mx-3"><u>Commentaire(s):</u></h2>
                 <div class="d-flex flex-column  border"
                      style="max-height: 40em; overflow-y: auto;">
                     {% for commentary in commentaries %}
-                        <div class="d-flex flex-row border" style="margin: 1em">
-                            <div class="m-3 justify-content-center d-flex">
-                                {% if detailsProject.id_mongo is not null %}
-                                    <!-- Revoir affichage Image (traitement dans le back)-->
-                                    <div>{{ commentary.id_mongo }}</div>
-                                {% else %}
-                                    <div class="circular--landscape">
-                                        <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
-                                             style="object-fit: cover">
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="d-flex flex-column w-100">
-                                <div class="d-flex flex-row mw-100">
-                                    <h4 class=" text-primary">
-                                        <u>{{ commentary.firstname }} {{ commentary.lastname }}</u></h4>
+                        {% if commentary.id != idUserConnected %}
+                            <div class="d-flex flex-row border" style="margin: 1em">
+                                <div class="m-3 justify-content-center d-flex">
+                                    {% if detailsProject.id_mongo is not null %}
+                                        <!-- Revoir affichage Image (traitement dans le back)-->
+                                        <div>{{ commentary.id_mongo }}</div>
+                                    {% else %}
+                                        <div class="circular--landscape">
+                                            <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
+                                                 style="object-fit: cover" alt="Erreur de chargement de l'image">
+                                        </div>
+                                    {% endif %}
                                 </div>
-                                <p><u>{{ commentary.date_comment|date('d-m-Y') }}
-                                        à {{ commentary.date_comment|date('H') }}
-                                        h{{ commentary.date_comment|date('i') }}</u></p>
-                                <p class="border mb-3 mx-3">{{ commentary.comment }}</p>
+                                <div class="d-flex flex-column w-100">
+                                    <div class="d-flex flex-row mw-100">
+                                        <h4 class=" text-primary">
+                                            <u>{{ commentary.firstname }} {{ commentary.lastname }}</u></h4>
+                                    </div>
+                                    <p><u>{{ commentary.date_comment|date('d-m-Y') }}
+                                            à {{ commentary.date_comment|date('H') }}
+                                            h{{ commentary.date_comment|date('i') }}</u></p>
+                                    <div class="border mb-3 m-3">
+                                        <p class="m-3">{{ commentary.comment }}</p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
-                <div class="mw-100 mx-3 my-2">
-                    <form class="d-flex flex-column">
-                        <textarea placeholder="Entrez ici votre commentaire"></textarea>
-                        <a href="{{ path('detailproject',  {'id': 1}) }}" class="btn btn-primary mw-100 add mx-5 my-2">Commenter</a>
-                    </form>
-                </div>
+                {% set commented = 0 %}
+                {% for commentary in commentaries %}
+                    {% if commentary.id == idUserConnected %}
+                        <div class="mw-100 mx-3 my-2">
+                            <form action="{{ path('UpdateCommente',  {'id': detailsProject.id}) }}" method="POST" class="d-flex flex-column">
+                                <label for="commentaire" class="h5"><u>Votre commentaire:</u></label>
+                                <textarea id="commentaire" name="commentaire" class="form-control" placeholder="Entrez ici votre commentaire">{{ commentary.comment }}</textarea>
+                                <button type="submit" class="btn btn-primary mw-100 add mx-5 my-2">Valider la modification</button>
+                            </form>
+                        </div>
+                        {% set commented = 1 %}
+                    {% endif %}
+                {% endfor %}
+                {% if commented == 0 %}
+                    <div class="mw-100 mx-3 my-2">
+                        <form action="{{ path('commente', {'id': detailsProject.id}) }}" method="POST" class="d-flex flex-column">
+                            <label for="commentaire" class="h5"><u>Commentaire:</u></label>
+                            <textarea id="commentaire" name="commentaire" class="form-control" placeholder="Entrez ici votre commentaire"></textarea>
+                            <button type="submit" class="btn btn-primary mw-100 add mx-5 my-2">Commenter</button>
+                        </form>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

@@ -63,7 +63,7 @@ class ProjectRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = "
-        SELECT project.name, project.repo, project.description, project.date_creation, project.id_mongo, status.status
+        SELECT project.id, project.name, project.repo, project.description, project.date_creation, project.id_mongo, status.status
         FROM project INNER JOIN status ON project.status_id = status.id
         WHERE project.id = :id";
 
