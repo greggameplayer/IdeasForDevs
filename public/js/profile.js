@@ -33,5 +33,56 @@ window.addEventListener("load", () => {
                 }
             });
             $(".multiselect").addClass("btn btn-primary");
+            fetch('/api/user/jobs')
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(json) {
+                    json.forEach((el) => {
+                        jobs.push(el);
+                        $("#jobsSelect").multiselect('select', el);
+                    });
+                    $("#personalinfossubmitbtn").attr("disabled", false)
+                });
         });
+
+        document.querySelector("#infosform").addEventListener("submit", (event) => {
+            event.preventDefault();
+            fetch('/user/personalInfos', {
+                method: 'POST',
+                body: JSON.stringify({firstname: document.querySelector("#firstname").value, lastname: document.querySelector("#lastname").value, birthDate: document.querySelector("#birthDate").value, jobs: jobs})
+            })
+                .then((response) => response.json())
+                .then((json) => {
+                    if(typeof json.message != "undefined" && json.message === "ok") {
+                        document.querySelector("#toastheader").innerHTML = "Informations personnelles";
+                        document.querySelector("#toastalert .toast-body").innerHTML = "Sauvegardé avec succès !";
+
+                        $("#toastalert").toast({delay: 4000}).toast('show');
+                    }
+                });
+        });
+
+        document.querySelector("#mdpform").addEventListener("submit", (event) => {
+            event.preventDefault();
+            document.querySelector("#newpassword").classList.remove("is-invalid");
+            document.querySelector("#confirmpassword").classList.remove("is-invalid");
+            document.querySelectorAll(".invalid-feedback").forEach((el) => {
+                document.querySelector("#mdpform").removeChild(el);
+            })
+            let feedback = document.createElement("div");
+            if(document.querySelector("#newpassword").value !== document.querySelector("#confirmpassword").value) {
+                feedback.classList.add("invalid-feedback");
+                feedback.innerHTML = "Les mot de passe doivent être identique !";
+                document.querySelector("#newpassword").classList.add("is-invalid");
+                document.querySelector("#confirmpassword").classList.add("is-invalid");
+                document.querySelector("#newpassword").after(feedback);
+            } else if (document.querySelector("#newpassword").value.length < 8) {
+                feedback.classList.add("invalid-feedback");
+                feedback.innerHTML = "Le nouveau mot de passe doit faire au moins 8 caractères !";
+                document.querySelector("#newpassword").classList.add("is-invalid");
+                document.querySelector("#confirmpassword").classList.add("is-invalid");
+                document.querySelector("#newpassword").after(feedback);
+            }
+        })
 });

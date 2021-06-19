@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Account;
 use App\Entity\JobsAccount;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -35,6 +36,15 @@ class JobsAccountRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function removeAllJobsAccountForAUser(Account $account) {
+        return $this->createQueryBuilder('q')
+            ->delete()
+            ->where('q.account = :account')
+            ->setParameter('account', $account)
+            ->getQuery()
+            ->execute();
+    }
 
     /*
     public function findOneBySomeField($value): ?JobsAccount
