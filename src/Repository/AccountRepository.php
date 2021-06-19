@@ -53,7 +53,7 @@ class AccountRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = "
-        SELECT account.firstname, account.lastname, account.id_mongo, account.subscribe_date, account.skills, account.role, job.name
+        SELECT account.firstname, account.lastname, account.id_mongo, account.subscribe_date, job.name
         FROM account INNER JOIN jobs_account ON account.id = jobs_account.account_id 
             INNER JOIN job ON jobs_account.job_id = job.id
         WHERE account.id = :id";
@@ -62,4 +62,19 @@ class AccountRepository extends ServiceEntityRepository
 
         return $stmt->executeQuery(['id' => $id])->fetchAllAssociative()[0];
     }
+
+    public function skillsForEachAdmin($id)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT account.skills
+        FROM account
+        WHERE account.id = :id";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['id' => $id])->fetchOne();
+    }
+
 }

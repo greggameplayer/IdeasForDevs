@@ -63,7 +63,7 @@ class ProjectRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = "
-        SELECT project.name, project.repo, project.description, project.date_creation, project.id_mongo, project.skills_needed, project.job_needed, status.status
+        SELECT project.name, project.repo, project.description, project.date_creation, project.id_mongo, status.status
         FROM project INNER JOIN status ON project.status_id = status.id
         WHERE project.id = :id";
 
@@ -71,5 +71,20 @@ class ProjectRepository extends ServiceEntityRepository
 
         return $stmt->executeQuery(['id' => $id])->fetchAllAssociative()[0];
     }
+
+    public function skillsAndJobsNeeded($id) :array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT project.skills_needed, project.job_needed
+        FROM project
+        WHERE project.id = :id";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['id' => $id])->fetchAllAssociative()[0];
+    }
+
 
 }

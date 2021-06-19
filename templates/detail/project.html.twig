@@ -1,52 +1,166 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello DetailController!{% endblock %}
+{% block title %}Détails de projet{% endblock %}
 
 {% block body %}
+    <style>
+        .circular--landscape {
+            display: inline-block;
+            position: relative;
+            width: 100px;
+            height: 100px;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+    </style>
 
-<div class="flex-column page-section justify-content-center mx-auto mt-5 w-75">
-    <div> Projet:</div>
-    <br>
-    <div>{{ detailsProject.name }}</div>
-    <!-- Revoir affichage Image (traitement dans le back)-->
-    <div>{{ detailsProject.id_mongo }}</div>
+    <div class="flex-column page-section">
+        <div id="project" class="d-flex flex-row flex-wrap">
+            <div class="justify-content-center d-flex flex-column"
+                 style="max-width: 40em; min-width: 20em; margin: 2em">
+                {% if detailsProject.id_mongo is not null %}
+                    <!-- Revoir affichage Image (traitement dans le back)-->
+                    <div>{{ detailsProject.id_mongo }}</div>
+                {% else %}
+                    <img src="{{ asset('images/noIMG.jpg') }}" style="object-fit: cover">
+                {% endif %}
+                <div id="votes" class="d-flex flex-row justify-content-center w-100 border mt-3">
+                    <div class="d-flex flex-column mx-auto justify-content-center text-center">
+                        <h6>Vote POUR</h6>
+                        <p><u>{{ countFor }}</u></p>
+                    </div>
+                    <div class="d-flex flex-column mx-auto justify-content-center text-center">
+                        <h6>Vote CONTRE</h6>
+                        <p><u>{{ countAgainst }}</u></p>
+                    </div>
+                </div>
 
-    <div>{{ detailsProject.description }}</div>
-    <div>{{ detailsProject.date_creation|date('Y-m-d H') }} h {{ detailsProject.date_creation|date('i') }}</div>
-    <div>{{ detailsProject.status }}</div>
-    <!-- Revoir affichage JSON-->
-    <div>{{ detailsProject.skills_needed }}</div>
-    <div>{{ detailsProject.job_needed }}</div>
-
-    <div>{{ countFor }}</div>
-    <div>{{ countAgainst }}</div>
-    <br>
-    <br>
-    <div> Commentaires:</div>
-    {% for commentary in commentaries %}
-        <div>{{ commentary.id_mongo }}</div>
-        <div>{{ commentary.firstname }}</div>
-        <div>{{ commentary.lastname }}</div>
-        <div>{{ commentary.date_comment|date('Y-m-d H')}} h {{ commentary.date_comment|date('i') }}</div>
-        <div>{{ commentary.comment }}</div>
-    {% endfor %}
-    <br>
-    <br>
-    <div>Administrateur</div>
-    {% for i in 0..detailsAdminProjectForEachAdmin|length-1 %}
-       <div>{{ detailsAdminProjectForEachAdmin[i].id_mongo }}</div>
-       <div>{{ detailsAdminProjectForEachAdmin[i].firstname }}</div>
-       <div>{{ detailsAdminProjectForEachAdmin[i].lastname }}</div>
-       <div>{{ detailsAdminProjectForEachAdmin[i].subscribe_date }}</div>
-       <div>{{ detailsAdminProjectForEachAdmin[i].skills }}</div>
-       <div>{{ detailsAdminProjectForEachAdmin[i].name }}</div>
-        <div>{{ countProjectAsAdminForEachAdmin[i] }}</div>
-        <div>{{ countProjectParticipationForEachAdmin[i] }}</div>
-        <div>{{ countProjectSuccessfullForEachAdmin[i] }}</div>
-
-   {% endfor %}
-
+            </div>
+            <div class="d-flex flex-column border justify-content-center"
+                 style="max-width: 70em; min-width: 10em; margin: 2em">
+                <div class="d-flex flex-row">
+                    <h2><u>Projet:</u></h2>
+                    <a href="#" class="justify-content-end mt-3" title="Signaler le projet"
+                       style="margin-left: auto; margin-right: 1.6em"><i class="far fa-flag text-danger fa-2x"></i></a>
+                </div>
+                <div class="d-flex flex-row">
+                    <h3 class="mx-2 text-primary">{{ detailsProject.name }}</h3>
+                    <p>({{ detailsProject.status }})</p>
+                </div>
+                <div class="">
+                    <h5>Date de création:</h5>
+                    <p class="mx-2">{{ detailsProject.date_creation|date('d-m-Y') }}
+                        à {{ detailsProject.date_creation|date('H') }}h{{ detailsProject.date_creation|date('i') }}</p>
+                    <h5>Description:</h5>
+                    <p class="mx-2">{{ detailsProject.description }}</p>
+                    <div class="mx-5 my-2 border">
+                        <h4>Compétence(s) voulue(s):</h4>
+                        {% for skill in skillsNeeded %}
+                            <p class="mx-2">- {{ skill }}</p>
+                        {% endfor %}
+                    </div>
+                    <div class="mx-5 my-2 mb-4 border">
+                        <h4>Role(s) voulu(s):</h4>
+                        {% for job in jobsNeeded %}
+                            <p class="mx-2">- {{ job }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
-</div>
+        <div class="d-flex flex-column mt-3">
+            <h2 class="mx-3"><u>Administrateur(s):</u></h2>
+            {% for i in 0..detailsAdminProjectForEachAdmin|length-1 %}
+                <div class="d-flex flex-row border" style="margin: 2em">
+                    <div class="m-3 justify-content-center d-flex">
+                        {% if detailsProject.id_mongo is not null %}
+                            <!-- Revoir affichage Image (traitement dans le back)-->
+                            <div>{{ detailsAdminProjectForEachAdmin[i].id_mongo }}</div>
+                        {% else %}
+                            <div class="circular--landscape">
+                                <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
+                                     style="object-fit: cover">
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex flex-column w-100">
+                        <div class="d-flex flex-row mw-100">
+                            <h3 class=" text-primary">
+                                <u>{{ detailsAdminProjectForEachAdmin[i].firstname }} {{ detailsAdminProjectForEachAdmin[i].lastname }}</u>
+                            </h3>
+                            <p class="mx-2">(inscrit
+                                le {{ detailsAdminProjectForEachAdmin[i].subscribe_date|date('d-m-Y') }})</p>
+                            <a href="#" class="justify-content-end mt-3" title="Signaler l'administrateur"
+                               style="margin-left: auto; margin-right: 1.6em"><i
+                                        class="far fa-flag text-danger fa-2x"></i></a>
+                        </div>
+                        <h4>Rôle:</h4>
+                        <p class="mx-2">{{ detailsAdminProjectForEachAdmin[i].name }}</p>
+                        <div class="border mx-5 my-2 mw-100">
+                            <h4>Compétence(s):</h4>
+                            {% for skill in skillsForEachAdmin[i] %}
+                                <p class="mx-2">- {{ skill }}</p>
+                            {% endfor %}
+                        </div>
+                        <div class="d-flex flex-row border mx-5 my-2 mb-4 flex-wrap mw-100">
+                            <div class="d-flex flex-column mw-100">
+                                <h4>Historique:</h4>
+                                <p class="mx-2">Nombre de projet proposé :
+                                    <u>{{ countProjectAsAdminForEachAdmin[i] }}</u></p>
+                                <p class="mx-2">Nombre de participation à des projets:
+                                    <u>{{ countProjectParticipationForEachAdmin[i] }}</u></p>
+                                <p class="mx-2">Nombre de projet abouti:
+                                    <u>{{ countProjectSuccessfullForEachAdmin[i] }}</u></p>
+                            </div>
+                            <div class="d-flex flex-column align-content-end my-auto mx-auto"
+                                 style="width: 60%; margin: 2em">
+                                <a href="{{ path('detailproject',  {'id': 1}) }}" class="btn btn-primary mw-100 add">Historique</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+
+            <div class="d-flex flex-column mt-3 border" style=" margin: 2em;">
+                <h2 class="mx-3"><u>Commentaires(s):</u></h2>
+                <div class="d-flex flex-column  border"
+                     style="max-height: 40em; overflow-y: auto;">
+                    {% for commentary in commentaries %}
+                        <div class="d-flex flex-row border" style="margin: 1em">
+                            <div class="m-3 justify-content-center d-flex">
+                                {% if detailsProject.id_mongo is not null %}
+                                    <!-- Revoir affichage Image (traitement dans le back)-->
+                                    <div>{{ commentary.id_mongo }}</div>
+                                {% else %}
+                                    <div class="circular--landscape">
+                                        <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
+                                             style="object-fit: cover">
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex flex-column w-100">
+                                <div class="d-flex flex-row mw-100">
+                                    <h4 class=" text-primary">
+                                        <u>{{ commentary.firstname }} {{ commentary.lastname }}</u></h4>
+                                </div>
+                                <p><u>{{ commentary.date_comment|date('d-m-Y') }}
+                                        à {{ commentary.date_comment|date('H') }}
+                                        h{{ commentary.date_comment|date('i') }}</u></p>
+                                <p class="border mb-3 mx-3">{{ commentary.comment }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="mw-100 mx-3 my-2">
+                    <form class="d-flex flex-column">
+                        <textarea placeholder="Entrez ici votre commentaire"></textarea>
+                        <a href="{{ path('detailproject',  {'id': 1}) }}" class="btn btn-primary mw-100 add mx-5 my-2">Commenter</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

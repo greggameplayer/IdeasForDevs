@@ -26,21 +26,27 @@ class DetailController extends AbstractController
         $countProjectAsAdminForEachAdmin = new ArrayObject(array());
         $countProjectParticipationForEachAdmin = new ArrayObject(array());
         $countProjectSuccessfullForEachAdmin = new ArrayObject(array());
+        $skillsForEachAdmin = new ArrayObject(array());
 
         foreach ($IdsOfAdmins as $idAdmin){
             $detailsAdminProjectForEachAdmin->append($this->getDoctrine()->getRepository(Account::class)->detailsAdminProjectForEachAdmin($idAdmin));
+            $skillsForEachAdmin->append(json_decode($this->getDoctrine()->getRepository(Account::class)->skillsForEachAdmin($idAdmin)));
             $countProjectAsAdminForEachAdmin->append($this->getDoctrine()->getRepository(Apply::class)->countProjectAsAdmin($idAdmin));
             $countProjectParticipationForEachAdmin->append($this->getDoctrine()->getRepository(Apply::class)->countProjectParticipation($idAdmin));
             $countProjectSuccessfullForEachAdmin->append($this->getDoctrine()->getRepository(Apply::class)->countProjectSuccessfull($idAdmin));
         }
 
+
         return $this->render('detail/project.html.twig', [
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
             'detailsProject' => $this->getDoctrine()->getRepository(Project::class)->detailsProject($id),
+            'skillsNeeded' => json_decode($this->getDoctrine()->getRepository(Project::class)->skillsAndJobsNeeded($id)["skills_needed"]),
+            'jobsNeeded' => json_decode($this->getDoctrine()->getRepository(Project::class)->skillsAndJobsNeeded($id)["job_needed"]),
             'commentaries' => $this->getDoctrine()->getRepository(Commentary::class)->GetCommentariesAndUser($id),
             'countFor' => $this->getDoctrine()->getRepository(IsFor::class)->countVotesFor($id),
             'countAgainst' => $this->getDoctrine()->getRepository(IsFor::class)->countVotesAgainst($id),
             'detailsAdminProjectForEachAdmin' => $detailsAdminProjectForEachAdmin,
+            'skillsForEachAdmin' => $skillsForEachAdmin,
             'countProjectAsAdminForEachAdmin' => $countProjectAsAdminForEachAdmin,
             'countProjectParticipationForEachAdmin' => $countProjectParticipationForEachAdmin,
             'countProjectSuccessfullForEachAdmin' => $countProjectSuccessfullForEachAdmin,
