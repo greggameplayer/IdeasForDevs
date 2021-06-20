@@ -65,6 +65,7 @@ window.addEventListener("load", () => {
 
         document.querySelector("#mdpform").addEventListener("submit", (event) => {
             event.preventDefault();
+            document.querySelector("#oldpassword").classList.remove("is-invalid");
             document.querySelector("#newpassword").classList.remove("is-invalid");
             document.querySelector("#confirmpassword").classList.remove("is-invalid");
             document.querySelectorAll(".invalid-feedback").forEach((el) => {
@@ -84,5 +85,36 @@ window.addEventListener("load", () => {
                 document.querySelector("#confirmpassword").classList.add("is-invalid");
                 document.querySelector("#newpassword").after(feedback);
             }
+
+            fetch('/user/password', {
+                method: "POST",
+                body: JSON.stringify({oldpassword: document.querySelector("#oldpassword").value, password: document.querySelector("#newpassword").value, confirmpassword: document.querySelector("#confirmpassword").value})
+            })
+                .then((response) => response.json())
+                .then((json) => {
+                   if (typeof json.error != "undefined") {
+                       let feedback = document.createElement("div");
+                       if (json.error.type === "oldpassword") {
+                           feedback.classList.add("invalid-feedback");
+                           feedback.innerHTML = json.error.message;
+                           document.querySelector("#oldpassword").classList.add("is-invalid");
+                           document.querySelector("#oldpassword").after(feedback);
+                       } else if (json.error.type === "newpassword") {
+                           feedback.classList.add("invalid-feedback");
+                           feedback.innerHTML = json.error.message;
+                           document.querySelector("#newpassword").classList.add("is-invalid");
+                           document.querySelector("#confirmpassword").classList.add("is-invalid");
+                           document.querySelector("#newpassword").after(feedback);
+                       }
+                   } else {
+                       document.querySelector("#toastheader").innerHTML = "Mot de passe";
+                       document.querySelector("#toastalert .toast-body").innerHTML = "Sauvegardé avec succès !";
+
+                       $("#toastalert").toast({delay: 4000}).toast('show');
+                       document.querySelector("#oldpassword").value = "";
+                       document.querySelector("#newpassword").value = "";
+                       document.querySelector("#confirmpassword").value = "";
+                   }
+                });
         })
 });
