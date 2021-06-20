@@ -3,12 +3,17 @@
 namespace App\Controller;
 
 
+use App\Document\Avatar;
 use App\Entity\Account;
 use App\Entity\Job;
 use App\Entity\JobsAccount;
 use DateTime;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\MongoDBException;
 use Exception;
+use MongoDB\BSON\ObjectId;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,21 +24,42 @@ class ProfileController extends AbstractController
 {
     private $passwordEncoder;
 
-    public function __construct(UserPasswordEncoderInterface $passwordEncoder) {
+    private $filesystem;
+
+    public function __construct(UserPasswordEncoderInterface $passwordEncoder, Filesystem $filesystem) {
         $this->passwordEncoder = $passwordEncoder;
+        $this->filesystem = $filesystem;
     }
 
 
     /**
      * @Route("/profile", name="profile")
+     * @throws MongoDBException
      */
-    public function index(): Response
+    public function index(DocumentManager $dm): Response
     {
+        /** @var Account $user */
+        $user = $this->getUser();
+
+        $oid = new ObjectId(); // create Mongo ObjectId
+        $oid->unserialize($user->getIdMongo()); // unserialize user mongo avatar id
+
+        $tempfile = $this->filesystem->tempnam($this->getParameter('kernel.project_dir') . "/public/uploads", "avt", '.png'); // create a temporary file in /public/uploads to store and use the avatar image
+        $this->filesystem->chmod($tempfile, 0777); // give max permission on this temp file
+        $stream = fopen($tempfile, "w+"); // open a file stream to write this temporary file
+        try {
+            $dm->getDocumentBucket(Avatar::class)->downloadToStream($oid, $stream); // download the user avatar image through mongodb with it's id and store it in the temp file
+        } finally {
+            fclose($stream); // close the file stream
+        }
+
+
         return $this->render('profile/index.html.twig', [
-            'firstname' => $this->getUser()->getFirstname(),
-            'lastname' => $this->getUser()->getLastname(),
-            'birthDate' => $this->getUser()->getBirthDate(),
-            'email' => $this->getUser()->getEmail()
+            'firstname' => $user->getFirstname(),
+            'lastname' => $user->getLastname(),
+            'birthDate' => $user->getBirthDate(),
+            'email' => $user->getEmail(),
+            'avatar' => 'uploads/' . basename($tempfile)
         ]);
     }
 

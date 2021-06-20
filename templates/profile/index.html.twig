@@ -42,7 +42,11 @@
                 </div>
                 <div class="card-body d-flex flex-column align-self-center">
                     <div class="circular--landscape align-self-center" style="max-height: 25%;">
-                        <img src="{{ asset('images/noIMG.jpg') }}" alt="avatar" style="object-fit: cover; height: 100%; width: 100%;"/>
+                        {% if avatar is not defined or avatar is null %}
+                            <img src="{{ asset('images/noIMG.jpg') }}" alt="avatar" style="object-fit: cover; height: 100%; width: 100%;"/>
+                        {% else %}
+                            <img src="{{ asset(avatar) }}" alt="avatar" style="object-fit: cover; height: 100%; width: 100%;"/>
+                        {% endif %}
                     </div>
                     <form name="avatarform" id="avatarform" method="post" enctype="multipart/form-data" class="mt-5">
                         <input type="file" id="avatarfile" name="avatar" class="form-control" accept="image/png, image/jpg, image/jpeg, image/gif" required/>
