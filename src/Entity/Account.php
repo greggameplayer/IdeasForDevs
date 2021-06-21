@@ -54,6 +54,11 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
     private $idMongo;
 
     /**
+     * @ORM\Column(type="string", length=1000, nullable=true)
+     */
+    private $tempAvatar;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     private $subscribeDate;
@@ -200,6 +205,18 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIdMongo(?string $idMongo): self
     {
         $this->idMongo = $idMongo;
+
+        return $this;
+    }
+
+    public function getTempAvatar() : ?string
+    {
+        return $this->tempAvatar;
+    }
+
+    public function setTempAvatar(?string $tempAvatar): self
+    {
+        $this->tempAvatar = $tempAvatar;
 
         return $this;
     }

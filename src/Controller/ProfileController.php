@@ -10,6 +10,7 @@ use App\Entity\JobsAccount;
 use DateTime;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\MongoDBException;
+use Doctrine\Persistence\ObjectManager;
 use Exception;
 use MongoDB\BSON\ObjectId;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,24 +35,13 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/profile", name="profile")
-     * @throws MongoDBException
      */
     public function index(DocumentManager $dm): Response
     {
         /** @var Account $user */
         $user = $this->getUser();
 
-        $oid = new ObjectId(); // create Mongo ObjectId
-        $oid->unserialize($user->getIdMongo()); // unserialize user mongo avatar id
-
-        $tempfile = $this->filesystem->tempnam($this->getParameter('kernel.project_dir') . "/public/uploads", "avt", '.png'); // create a temporary file in /public/uploads to store and use the avatar image
-        $this->filesystem->chmod($tempfile, 0777); // give max permission on this temp file
-        $stream = fopen($tempfile, "w+"); // open a file stream to write this temporary file
-        try {
-            $dm->getDocumentBucket(Avatar::class)->downloadToStream($oid, $stream); // download the user avatar image through mongodb with it's id and store it in the temp file
-        } finally {
-            fclose($stream); // close the file stream
-        }
+        $tempfile = $this::getUserAvatar($user, $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir'));
 
 
         return $this->render('profile/index.html.twig', [
@@ -59,7 +49,7 @@ class ProfileController extends AbstractController
             'lastname' => $user->getLastname(),
             'birthDate' => $user->getBirthDate(),
             'email' => $user->getEmail(),
-            'avatar' => 'uploads/' . basename($tempfile)
+            'avatar' => $tempfile
         ]);
     }
 
@@ -133,5 +123,34 @@ class ProfileController extends AbstractController
         $entityManager->flush();
 
         return $this->json(["message" => "ok"]);
+    }
+
+    public static function getUserAvatar(Account $user, DocumentManager $dm, Filesystem $filesystem, ObjectManager $manager, string $projectDir): ?string
+    {
+        $tempPathBDD = $user->getTempAvatar();
+
+        $result = $tempPathBDD;
+
+        if ($tempPathBDD == null || !$filesystem->exists($projectDir . "/public/" . $tempPathBDD)) {
+            $oid = new ObjectId(); // create Mongo ObjectId
+            $oid->unserialize($user->getIdMongo()); // unserialize user mongo avatar id
+
+            $tempfile = $filesystem->tempnam($projectDir . "/public/uploads", "avt", '.png'); // create a temporary file in /public/uploads to store and use the avatar image
+            $filesystem->chmod($tempfile, 0777); // give max permission on this temp file
+            $stream = fopen($tempfile, "w+"); // open a file stream to write this temporary file
+            try {
+                $dm->getDocumentBucket(Avatar::class)->downloadToStream($oid, $stream); // download the user avatar image through mongodb with it's id and store it in the temp file
+                $result = 'uploads/' . basename($tempfile);
+                $user->setTempAvatar($result);
+                $manager->persist($user);
+                $manager->flush();
+            } catch (MongoDBException $e) {
+                $result = null;
+            } finally {
+                fclose($stream); // close the file stream
+            }
+        }
+
+        return $result;
     }
 }
