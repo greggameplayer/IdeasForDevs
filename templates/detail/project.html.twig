@@ -15,8 +15,8 @@
     </style>
 
     <div class="flex-column page-section">
-        <div class="d-flex flex-row flex-wrap">
-            <div class="justify-content-center d-flex flex-column"
+        <div class="d-flex flex-row flex-wrap-reverse">
+            <div class="d-flex flex-column"
                  style="max-width: 40em; min-width: 20em; margin: 2em">
                 {% if detailsProject.id_mongo is not null %}
                     <!-- Revoir affichage Image (traitement dans le back)-->
@@ -71,51 +71,53 @@
         <div class="d-flex flex-column mt-3">
             <h2 class="mx-3"><u>Administrateur(s):</u></h2>
             {% for i in 0..detailsAdminProjectForEachAdmin|length-1 %}
-                <div class="d-flex flex-row border" style="margin: 2em">
-                    <div class="m-3 justify-content-center d-flex">
-                        {% if detailsProject.id_mongo is not null %}
-                            <!-- Revoir affichage Image (traitement dans le back)-->
-                            <div>{{ detailsAdminProjectForEachAdmin[i].id_mongo }}</div>
-                        {% else %}
-                            <div class="circular--landscape">
-                                <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
-                                     style="object-fit: cover" alt="Erreur de chargement de l'image">
+                <div class="d-flex flex-column border" style="margin: 2em">
+                    <div class="d-flex flex-row">
+                        <div class="m-3 justify-content-center d-flex">
+                            {% if detailsProject.id_mongo is not null %}
+                                <!-- Revoir affichage Image (traitement dans le back)-->
+                                <div>{{ detailsAdminProjectForEachAdmin[i].id_mongo }}</div>
+                            {% else %}
+                                <div class="circular--landscape">
+                                    <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
+                                         style="object-fit: cover" alt="Erreur de chargement de l'image">
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex flex-column w-100">
+                            <div class="d-flex flex-row mw-100">
+                                <h3 class=" text-primary">
+                                    <u>{{ detailsAdminProjectForEachAdmin[i].firstname }} {{ detailsAdminProjectForEachAdmin[i].lastname }}</u>
+                                </h3>
+                                <p class="mx-2">(inscrit
+                                    le {{ detailsAdminProjectForEachAdmin[i].subscribe_date|date('d-m-Y') }})</p>
+                                <a href="#" class="justify-content-end mt-3" title="Signaler l'administrateur"
+                                   style="margin-left: auto; margin-right: 1.6em"><i
+                                            class="far fa-flag text-danger fa-2x"></i></a>
                             </div>
-                        {% endif %}
+                            <h4>Rôle:</h4>
+                            <p class="mx-2">{{ detailsAdminProjectForEachAdmin[i].name }}</p>
+                        </div>
                     </div>
-                    <div class="d-flex flex-column w-100">
-                        <div class="d-flex flex-row mw-100">
-                            <h3 class=" text-primary">
-                                <u>{{ detailsAdminProjectForEachAdmin[i].firstname }} {{ detailsAdminProjectForEachAdmin[i].lastname }}</u>
-                            </h3>
-                            <p class="mx-2">(inscrit
-                                le {{ detailsAdminProjectForEachAdmin[i].subscribe_date|date('d-m-Y') }})</p>
-                            <a href="#" class="justify-content-end mt-3" title="Signaler l'administrateur"
-                               style="margin-left: auto; margin-right: 1.6em"><i
-                                        class="far fa-flag text-danger fa-2x"></i></a>
+                    <div class="border mx-5 my-2 mw-100">
+                        <h4>Compétence(s):</h4>
+                        {% for skill in skillsForEachAdmin[i] %}
+                            <p class="mx-2">- {{ skill }}</p>
+                        {% endfor %}
+                    </div>
+                    <div class="d-flex flex-row border mx-5 my-2 mb-4 flex-wrap mw-100">
+                        <div class="d-flex flex-column mw-100">
+                            <h4>Historique:</h4>
+                            <p class="mx-2">Nombre de projet proposé :
+                                <u>{{ countProjectAsAdminForEachAdmin[i] }}</u></p>
+                            <p class="mx-2">Nombre de participation à des projets:
+                                <u>{{ countProjectParticipationForEachAdmin[i] }}</u></p>
+                            <p class="mx-2">Nombre de projet abouti:
+                                <u>{{ countProjectSuccessfullForEachAdmin[i] }}</u></p>
                         </div>
-                        <h4>Rôle:</h4>
-                        <p class="mx-2">{{ detailsAdminProjectForEachAdmin[i].name }}</p>
-                        <div class="border mx-5 my-2 mw-100">
-                            <h4>Compétence(s):</h4>
-                            {% for skill in skillsForEachAdmin[i] %}
-                                <p class="mx-2">- {{ skill }}</p>
-                            {% endfor %}
-                        </div>
-                        <div class="d-flex flex-row border mx-5 my-2 mb-4 flex-wrap mw-100">
-                            <div class="d-flex flex-column mw-100">
-                                <h4>Historique:</h4>
-                                <p class="mx-2">Nombre de projet proposé :
-                                    <u>{{ countProjectAsAdminForEachAdmin[i] }}</u></p>
-                                <p class="mx-2">Nombre de participation à des projets:
-                                    <u>{{ countProjectParticipationForEachAdmin[i] }}</u></p>
-                                <p class="mx-2">Nombre de projet abouti:
-                                    <u>{{ countProjectSuccessfullForEachAdmin[i] }}</u></p>
-                            </div>
-                            <div class="d-flex flex-column align-content-end my-auto mx-auto"
-                                 style="width: 60%; margin: 2em">
-                                <a href="{{ path('detailproject',  {'id': 1}) }}" class="btn btn-primary mw-100 add">Historique</a>
-                            </div>
+                        <div class="d-flex flex-column align-content-end my-auto mx-auto"
+                             style="width: 60%; margin: 2em">
+                            <a href="{{ path('detailproject',  {'id': 1}) }}" class="btn btn-primary mw-100 add">Historique</a>
                         </div>
                     </div>
                 </div>
@@ -126,29 +128,37 @@
                      style="max-height: 40em; overflow-y: auto;">
                     {% for commentary in commentaries %}
                         {% if commentary.id != idUserConnected %}
-                            <div class="d-flex flex-row border" style="margin: 1em">
-                                <div class="m-3 justify-content-center d-flex">
-                                    {% if detailsProject.id_mongo is not null %}
-                                        <!-- Revoir affichage Image (traitement dans le back)-->
-                                        <div>{{ commentary.id_mongo }}</div>
-                                    {% else %}
-                                        <div class="circular--landscape">
-                                            <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
-                                                 style="object-fit: cover" alt="Erreur de chargement de l'image">
+                            <div  class="d-flex flex-column border" style="margin: 1em">
+                                <div class="d-flex flex-row">
+                                    <div class="m-3 justify-content-center d-flex">
+                                        {% if detailsProject.id_mongo is not null %}
+                                            <!-- Revoir affichage Image (traitement dans le back)-->
+                                            <div>{{ commentary.id_mongo }}</div>
+                                        {% else %}
+                                            <div class="circular--landscape">
+                                                <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
+                                                     style="object-fit: cover" alt="Erreur de chargement de l'image">
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="d-flex flex-column w-100">
+                                        <div class="d-flex flex-row mw-100">
+                                            <h4 class=" text-primary">
+                                                <u>{{ commentary.firstname }} {{ commentary.lastname }}</u></h4>
+                                            <a href="#" class="justify-content-end mt-3" title="Signaler l'utilisateur"
+                                               style="margin-left: auto; margin-right: 1.6em"><i
+                                                        class="far fa-flag text-danger fa-2x"></i></a>
                                         </div>
-                                    {% endif %}
+                                        <p><u>{{ commentary.date_comment|date('d-m-Y') }}
+                                                à {{ commentary.date_comment|date('H') }}h{{ commentary.date_comment|date('i') }}</u></p>
+
+                                    </div>
                                 </div>
-                                <div class="d-flex flex-column w-100">
-                                    <div class="d-flex flex-row mw-100">
-                                        <h4 class=" text-primary">
-                                            <u>{{ commentary.firstname }} {{ commentary.lastname }}</u></h4>
-                                    </div>
-                                    <p><u>{{ commentary.date_comment|date('d-m-Y') }}
-                                            à {{ commentary.date_comment|date('H') }}
-                                            h{{ commentary.date_comment|date('i') }}</u></p>
-                                    <div class="border mb-3 m-3">
-                                        <p class="m-3">{{ commentary.comment }}</p>
-                                    </div>
+                                <div class="d-flex flex-row border mb-3 m-3">
+                                    <p class="m-3">{{ commentary.comment }}</p>
+                                    <a href="#" class="justify-content-end mt-3" title="Signaler le commentaire"
+                                       style="margin-left: auto; margin-right: 1.6em"><i
+                                                class="far fa-flag text-danger fa-2x"></i></a>
                                 </div>
                             </div>
                         {% endif %}
@@ -158,10 +168,14 @@
                 {% for commentary in commentaries %}
                     {% if commentary.id == idUserConnected %}
                         <div class="mw-100 mx-3 my-2">
-                            <form action="{{ path('UpdateCommente',  {'id': detailsProject.id}) }}" method="POST" class="d-flex flex-column">
+                            <form action="{{ path('UpdateCommente',  {'id': detailsProject.id}) }}" method="POST"
+                                  class="d-flex flex-column">
                                 <label for="commentaire" class="h5"><u>Votre commentaire:</u></label>
-                                <textarea id="commentaire" name="commentaire" class="form-control" placeholder="Entrez ici votre commentaire">{{ commentary.comment }}</textarea>
-                                <button type="submit" class="btn btn-primary mw-100 add mx-5 my-2">Valider la modification</button>
+                                <textarea id="commentaire" name="commentaire" class="form-control"
+                                          placeholder="Entrez ici votre commentaire">{{ commentary.comment }}</textarea>
+                                <button type="submit" class="btn btn-primary mw-100 add mx-5 my-2">Valider la
+                                    modification
+                                </button>
                             </form>
                         </div>
                         {% set commented = 1 %}
@@ -169,9 +183,11 @@
                 {% endfor %}
                 {% if commented == 0 %}
                     <div class="mw-100 mx-3 my-2">
-                        <form action="{{ path('commente', {'id': detailsProject.id}) }}" method="POST" class="d-flex flex-column">
+                        <form action="{{ path('commente', {'id': detailsProject.id}) }}" method="POST"
+                              class="d-flex flex-column">
                             <label for="commentaire" class="h5"><u>Commentaire:</u></label>
-                            <textarea id="commentaire" name="commentaire" class="form-control" placeholder="Entrez ici votre commentaire"></textarea>
+                            <textarea id="commentaire" name="commentaire" class="form-control"
+                                      placeholder="Entrez ici votre commentaire"></textarea>
                             <button type="submit" class="btn btn-primary mw-100 add mx-5 my-2">Commenter</button>
                         </form>
                     </div>

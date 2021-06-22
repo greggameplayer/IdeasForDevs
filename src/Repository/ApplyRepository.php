@@ -74,7 +74,7 @@ class ApplyRepository extends ServiceEntityRepository
         INNER JOIN account ON apply.id_account_id = account.id
         WHERE apply.id_project_id = :id
         AND role_project.name = 'Administrateur'
-        AND account.is_activated = 1
+        AND account.is_verified = 1
         ";
 
         $stmt = $conn->prepare($sql);
