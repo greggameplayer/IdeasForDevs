@@ -45,6 +45,21 @@ window.addEventListener("load", () => {
                     $("#personalinfossubmitbtn").attr("disabled", false)
                 });
         });
+    fetch('/api/user/skills')
+        .then((response) => response.json())
+        .then((json) => {
+           json.forEach((el) => {
+               document.querySelector("#skills_display ul").innerHTML += (`<li class="list-group-item d-flex flex-row justify-content-between">${el}<i class="fas fa-times deleteskills my-auto"></i></li>`);
+               skills.push(el);
+           });
+            document.querySelectorAll(".deleteskills").forEach((el, idx) => {
+                el.addEventListener("click", () => {
+                    document.querySelector("#skills_display ul").removeChild(el.parentElement);
+                    skills.splice(skills.indexOf(el.parentElement.innerText), 1);
+                });
+            })
+            document.querySelector("#skillsbtn").disabled = false;
+        });
 
         document.querySelector("#infosform").addEventListener("submit", (event) => {
             event.preventDefault();
@@ -166,3 +181,7 @@ window.addEventListener("load", () => {
                 })
         })
 });
+
+function sendSkills() {
+
+}

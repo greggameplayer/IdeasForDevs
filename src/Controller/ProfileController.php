@@ -64,6 +64,17 @@ class ProfileController extends AbstractController
     }
 
     /**
+     * @Route("/api/user/skills", name="userskills", methods={"GET"})
+     * @return JsonResponse
+     */
+    public function getCurrentUserSkills() : JsonResponse
+    {
+        /** @var Account $user */
+        $user = $this->getUser();
+        return $this->json($user->getSkills());
+    }
+
+    /**
      * @Route("/user/personalInfos", name="modifyPersonalInfos", methods={"POST"})
      * @param Request $request
      * @return JsonResponse
