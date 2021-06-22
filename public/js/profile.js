@@ -116,5 +116,53 @@ window.addEventListener("load", () => {
                        document.querySelector("#confirmpassword").value = "";
                    }
                 });
+        });
+
+    document.querySelector("#avatarfile").addEventListener("change", (event) => {
+        const target = event.target;
+        if (target.files[0].size > 2000000) {
+            target.value = "";
+        }
+        if (!["image/png", "image/jpg", "image/jpeg", "image/gif"].includes(target.files[0].type)) {
+            target.value = "";
+        }
+    })
+
+        document.querySelector("#avatarform").addEventListener("submit", (event) => {
+            event.preventDefault();
+            let data = new FormData();
+            data.append("avatar", document.querySelector("#avatarfile").files[0]);
+
+            document.querySelector("#avatarfile").classList.remove("is-invalid");
+            document.querySelectorAll(".invalid-feedback").forEach((el) => {
+                document.querySelector("#avatarform").removeChild(el);
+            })
+
+            document.querySelector("#avatarsubmit").disabled = true;
+
+            fetch('/user/avatar' , {
+                method: 'POST',
+                body: data
+            })
+                .then((response) => response.json())
+                .then((json) => {
+                    console.log(json);
+                    if (typeof json.error != "undefined") {
+                        let feedback = document.createElement("div");
+                        feedback.classList.add("invalid-feedback");
+                        feedback.innerHTML = json.error.message;
+                        document.querySelector("#avatarfile").classList.add("is-invalid");
+                        document.querySelector("#avatarfile").after(feedback);
+                        document.querySelector("#avatarsubmit").disabled = false;
+                    } else {
+                        document.querySelector("#toastheader").innerHTML = "Avatar";
+                        document.querySelector("#toastalert .toast-body").innerHTML = "Sauvegardé avec succès ! Rechargement en cours";
+
+                        $("#toastalert").toast({delay: 4000}).toast('show');
+                        setTimeout(() => {
+                            window.location.href = "/profile";
+                        }, 4000);
+                    }
+                })
         })
 });

@@ -15,6 +15,7 @@ use Exception;
 use MongoDB\BSON\ObjectId;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -117,6 +118,53 @@ class ProfileController extends AbstractController
         }
 
         $user->setPassword($this->passwordEncoder->encodePassword($user, $rq->password));
+
+        $entityManager->persist($user);
+
+        $entityManager->flush();
+
+        return $this->json(["message" => "ok"]);
+    }
+
+    /**
+     * @Route("/user/avatar", name="modifyAvatar", methods={"POST"})
+     * @param Request $request
+     * @return JsonResponse
+     * @throws MongoDBException
+     */
+    public function modifyAvatar(Request $request, DocumentManager $dm) : JsonResponse
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+
+        /** @var UploadedFile $document */
+        $document = $request->files->get("avatar");
+
+        /** @var Account $user */
+        $user = $this->getUser();
+
+        if(!in_array($document->guessExtension(), ["png", "jpg", "jpeg", "gif"])) {
+            $this->filesystem->remove($document->getPathname());
+            return $this->json(["error" => ["message" => "Le format du fichier pour l'avatar que vous avez envoyé n'est pas supporté !"]]);
+        } else if($document->getSize() > 2000000) {
+            $this->filesystem->remove($document->getPathname());
+            return $this->json(["error" => ["message" => "Votre fichier avatar pése plus de 2 Mo !"]]);
+        }
+
+        $oid = new ObjectId();
+        $oid->unserialize($user->getIdMongo());
+        $dm->getDocumentBucket(Avatar::class)->delete($oid);
+        $user->setTempAvatar(null);
+
+        /** @var resource $stream */
+        $stream = fopen($document->getPathname(), 'r');
+
+        /** @var ObjectId $id */
+        $id = $dm->getDocumentBucket(Avatar::class)->uploadFromStream($document->getClientOriginalName(), $stream);
+        fclose($stream);
+
+        $this->filesystem->remove($document->getPathname());
+
+        $user->setIdMongo($id->serialize());
 
         $entityManager->persist($user);
 
