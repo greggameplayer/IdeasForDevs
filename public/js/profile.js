@@ -7,10 +7,12 @@ window.addEventListener("load", () => {
             document.querySelector("#skills_display ul").innerHTML += (`<li class="list-group-item d-flex flex-row justify-content-between">${document.querySelector("#skills").value}<i class="fas fa-times deleteskills my-auto"></i></li>`);
             skills.push(document.querySelector("#skills").value);
             document.querySelector("#skills").value = "";
+            sendSkills(skills);
             document.querySelectorAll(".deleteskills").forEach((el, idx) => {
                 el.addEventListener("click", () => {
                     document.querySelector("#skills_display ul").removeChild(el.parentElement);
                     skills.splice(skills.indexOf(el.parentElement.innerText), 1);
+                    sendSkills(skills);
                 });
             })
         }
@@ -56,6 +58,7 @@ window.addEventListener("load", () => {
                 el.addEventListener("click", () => {
                     document.querySelector("#skills_display ul").removeChild(el.parentElement);
                     skills.splice(skills.indexOf(el.parentElement.innerText), 1);
+                    sendSkills(skills);
                 });
             })
             document.querySelector("#skillsbtn").disabled = false;
@@ -182,6 +185,19 @@ window.addEventListener("load", () => {
         })
 });
 
-function sendSkills() {
+function sendSkills(skills) {
+    console.log(skills);
+    fetch('/user/skills', {
+        method: "POST",
+        body: JSON.stringify({skills: skills})
+    })
+        .then((response) => response.json())
+        .then((json) => {
+            if(typeof json.error == "undefined") {
+                document.querySelector("#toastheader").innerHTML = "Compétences";
+                document.querySelector("#toastalert .toast-body").innerHTML = "Sauvegardé avec succès !";
 
+                $("#toastalert").toast({delay: 4000}).toast('show');
+            }
+        })
 }

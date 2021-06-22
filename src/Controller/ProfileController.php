@@ -184,6 +184,26 @@ class ProfileController extends AbstractController
         return $this->json(["message" => "ok"]);
     }
 
+    /**
+     * @Route("/user/skills", name="modifySkills", methods={"POST"})
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function modifySkills(Request $request) : JsonResponse
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $rq = json_decode($request->getContent());
+
+        /** @var Account $user */
+        $user = $this->getUser();
+
+        $user->setSkills($rq->skills);
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return $this->json(["message" => "ok"]);
+    }
+
     public static function getUserAvatar(Account $user, DocumentManager $dm, Filesystem $filesystem, ObjectManager $manager, string $projectDir): ?string
     {
         $tempPathBDD = $user->getTempAvatar();
