@@ -9,46 +9,71 @@ use App\Entity\IsFor;
 use App\Entity\Project;
 use ArrayObject;
 use DateTime;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use phpDocumentor\Reflection\Types\This;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class DetailController extends AbstractController
 {
+
+    private $filesystem;
+
+    public function __construct(Filesystem $filesystem)
+    {
+        $this->filesystem = $filesystem;
+    }
+
     /**
      * @Route("/project/{id}", name="detailproject")
      */
-    public function DetailProject($id): Response
+    public function DetailProject($id, DocumentManager $dm): Response
     {
 
         $IdsOfAdmins = $this->getDoctrine()->getRepository(Apply::class)->IdOfAdmins($id);
 
-        $detailsAdminProjectForEachAdmin =new ArrayObject(array());
+        $avatarAdminForEachAdmin = new ArrayObject(array());
+        $detailsAdminProjectForEachAdmin = new ArrayObject(array());
         $countProjectAsAdminForEachAdmin = new ArrayObject(array());
         $countProjectParticipationForEachAdmin = new ArrayObject(array());
         $countProjectSuccessfullForEachAdmin = new ArrayObject(array());
         $skillsForEachAdmin = new ArrayObject(array());
 
-        foreach ($IdsOfAdmins as $idAdmin){
+        foreach ($IdsOfAdmins as $idAdmin) {
             $detailsAdminProjectForEachAdmin->append($this->getDoctrine()->getRepository(Account::class)->detailsAdminProjectForEachAdmin($idAdmin));
+            $avatarAdminForEachAdmin->append(ProfileController::getUserAvatar($this->getDoctrine()->getRepository(Account::class)->find($idAdmin), $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir')));
             $skillsForEachAdmin->append(json_decode($this->getDoctrine()->getRepository(Account::class)->skillsForEachAdmin($idAdmin)));
             $countProjectAsAdminForEachAdmin->append($this->getDoctrine()->getRepository(Apply::class)->countProjectAsAdmin($idAdmin));
             $countProjectParticipationForEachAdmin->append($this->getDoctrine()->getRepository(Apply::class)->countProjectParticipation($idAdmin));
             $countProjectSuccessfullForEachAdmin->append($this->getDoctrine()->getRepository(Apply::class)->countProjectSuccessfull($idAdmin));
         }
 
+        $commentariesAndUser = $this->getDoctrine()->getRepository(Commentary::class)->GetCommentariesAndUser($id);
+        $avatarUserForEachCommentaries = new ArrayObject(array());
+
+        foreach ($commentariesAndUser as $commentaryAndUser){
+            $avatarUserForEachCommentaries->append(ProfileController::getUserAvatar($this->getDoctrine()->getRepository(Account::class)->find($commentaryAndUser['id']), $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir')));
+        }
+
 
         return $this->render('detail/project.html.twig', [
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
-            'idUserConnected' => $this->getUser(),
             'detailsProject' => $this->getDoctrine()->getRepository(Project::class)->detailsProject($id),
+            'imgProject' => null,
             'skillsNeeded' => json_decode($this->getDoctrine()->getRepository(Project::class)->skillsAndJobsNeeded($id)["skills_needed"]),
             'jobsNeeded' => json_decode($this->getDoctrine()->getRepository(Project::class)->skillsAndJobsNeeded($id)["job_needed"]),
-            'commentaries' => $this->getDoctrine()->getRepository(Commentary::class)->GetCommentariesAndUser($id),
+
+            'commentaries' => $commentariesAndUser,
+            'avatarUserForEachCommentaries' => $avatarUserForEachCommentaries,
+
             'countFor' => $this->getDoctrine()->getRepository(IsFor::class)->countVotesFor($id),
             'countAgainst' => $this->getDoctrine()->getRepository(IsFor::class)->countVotesAgainst($id),
+
             'detailsAdminProjectForEachAdmin' => $detailsAdminProjectForEachAdmin,
+            'avatarAdminForEachAdmin' => $avatarAdminForEachAdmin,
             'skillsForEachAdmin' => $skillsForEachAdmin,
             'countProjectAsAdminForEachAdmin' => $countProjectAsAdminForEachAdmin,
             'countProjectParticipationForEachAdmin' => $countProjectParticipationForEachAdmin,
