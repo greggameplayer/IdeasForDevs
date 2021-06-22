@@ -4,11 +4,10 @@ window.addEventListener("load", (event) => {
     $("#registration_form_avatar_avatar").attr("accept", "image/png, image/jpeg, image/jpg, image/gif");
 
     document.querySelector("#registration_form_avatar_avatar").addEventListener("change", (event) => {
-        const target = event.target
+        const target = event.target;
         if (target.files[0].size > 2000000) {
             target.value = "";
         }
-        console.log(target.files[0].type);
         if (!["image/png", "image/jpg", "image/jpeg", "image/gif"].includes(target.files[0].type)) {
             target.value = "";
         }
