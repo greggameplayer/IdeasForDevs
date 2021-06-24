@@ -4,84 +4,59 @@
 namespace App\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\File;
 
 /**
- * @MongoDB\Document
+ * @File
  */
 class ProjectImage
 {
     /** @MongoDB\Id */
     private $id;
 
-    /** @MongoDB\File */
-    private $file;
+    /** @File\Filename */
+    private $name;
 
-    /** @MongoDB\Field(type="string") */
-    private $filename;
-
-    /** @MongoDB\Field(type="string") */
-    private $mimeType;
-
-    /** @MongoDB\Field(type="date") */
+    /** @File\UploadDate */
     private $uploadDate;
 
-    /** @MongoDB\Field(type="int") */
+    /** @File\Length */
     private $length;
 
-    /** @MongoDB\Field(type="int") */
+    /** @File\ChunkSize */
     private $chunkSize;
 
-    /** @MongoDB\Field(type="string") */
-    private $md5;
+    /** @File\Metadata(targetDocument=ProjectImageMetadatas::class) */
+    private $metadata;
 
-    public function getFile()
+    public function getId(): ?string
     {
-        return $this->file;
+        return $this->id;
     }
 
-    public function setFile($file)
+    public function getName(): ?string
     {
-        $this->file = $file;
+        return $this->name;
     }
 
-    public function getFilename()
-    {
-        return $this->filename;
-    }
-
-    public function setFilename($filename)
-    {
-        $this->filename = $filename;
-    }
-
-    public function getMimeType()
-    {
-        return $this->mimeType;
-    }
-
-    public function setMimeType($mimeType)
-    {
-        $this->mimeType = $mimeType;
-    }
-
-    public function getChunkSize()
+    public function getChunkSize(): ?int
     {
         return $this->chunkSize;
     }
 
-    public function getLength()
+    public function getLength(): ?int
     {
         return $this->length;
     }
 
-    public function getMd5()
-    {
-        return $this->md5;
-    }
-
-    public function getUploadDate()
+    public function getUploadDate(): \DateTimeInterface
     {
         return $this->uploadDate;
+    }
+
+    public function getMetadata(): ?AvatarMetadatas
+    {
+        return $this->metadata;
     }
 }
 
