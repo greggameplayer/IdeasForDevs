@@ -102,10 +102,10 @@ class ProjectController extends AbstractController
                 else{
                     $dislikes++;
                 }
-                if($like->getIdAccount()->getId() == 1 && $like->getEvaluation()){
+                if($like->getIdAccount()->getId() == $this->getUser()->getId() && $like->getEvaluation()){
                     $noted = 1;
                 }
-                if($like->getIdAccount()->getId() == 1 && !$like->getEvaluation()){
+                if($like->getIdAccount()->getId() == $this->getUser()->getId() && !$like->getEvaluation()){
                     $noted = 2;
                 }
                 array_push($projectsNotation, [$noted, $likes, $dislikes]);

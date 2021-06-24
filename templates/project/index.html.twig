@@ -16,18 +16,19 @@
 
                 <div class="card d-flex flex-row" style="margin-bottom: 1em">
                     <div class="card-body d-flex justify-content-center my-auto" style="max-width: 10em">
-
-                        <div  class="flex-column justify-content-end" style="margin-right: 2em; margin-top: auto; margin-bottom: auto">
-                            <a data-toggle="tooltip" data-placement="top" title="J'aime" href="{{ path( 'addLike', {'idProject': project.id, } ) }}"><i class="fas fa-arrow-up fa-2x {% if notations[i][0] == 1 %} text-primary {% else %} text-dark{% endif %}"></i></a>
+                        <form  class="flex-column justify-content-end" style="margin-right: 2em; margin-top: auto; margin-bottom: auto" action="{{ path( 'addLike', {'idProject': project.id } ) }}" method="post">
+                            <input type="hidden" name="url" value="/allProjects">
+                            <button type="submit" data-toggle="tooltip" data-placement="top" title="J'aime" style="border: none; background: white"><i class="fas fa-arrow-up fa-2x {% if notations[i][0] == 1 %} text-primary {% else %} text-dark{% endif %}"></i></button>
                             <p class="text-center {% if notations[i][0] == 1 %} text-primary {% else %} text-dark{% endif %}" style="font-weight: bold; margin-bottom: 0">{{ notations[i][1] }}</p>
-                        </div>
-                        <div class="flex-column"  style="margin-top: auto; margin-bottom: auto">
-                            <a data-toggle="tooltip" data-placement="top" title="Je n'aime pas" href="{{ path( 'addDislike', {'idProject': project.id, } ) }}"> <i class="fas fa-arrow-down fa-2x {% if notations[i][0] == 2 %} text-danger {% else %} text-dark{% endif %} "></i> </a>
+                        </form>
+                        <form class="flex-column"  style="margin-top: auto; margin-bottom: auto" action="{{ path( 'addDislike', {'idProject': project.id } ) }}" method="post">
+                            <input type="hidden" name="url"  value="/allProjects">
+                            <button type="submit" data-toggle="tooltip" data-placement="top" title="Je n'aime pas" style="border: none; background: white"> <i class="fas fa-arrow-down fa-2x {% if notations[i][0] == 2 %} text-danger {% else %} text-dark{% endif %} "></i> </button>
                             <p class="text-center {% if notations[i][0] == 2 %} text-danger {% else %} text-dark{% endif %}" style="font-weight: bold; margin-bottom: 0">{{ notations[i][2] }}</p>
-                        </div>
+                        </form>
                     </div>
 
-                    <a href="#" id="seeMore">
+                    <a href=" {{ path('detailproject',  {'id': project.id}) }}" id="seeMore">
                     <div class="card-body d-flex flex-row">
                         <div class="col-sm-3" style="margin-right: 1em">
                             <img src="{{ asset('images/noIMG.jpg') }}"  style="width:100%">

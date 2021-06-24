@@ -51,12 +51,37 @@ class DetailController extends AbstractController
             $countProjectSuccessfullForEachAdmin->append($this->getDoctrine()->getRepository(Apply::class)->countProjectSuccessfull($idAdmin));
         }
 
+
         $commentariesAndUser = $this->getDoctrine()->getRepository(Commentary::class)->GetCommentariesAndUser($id);
         $avatarUserForEachCommentaries = new ArrayObject(array());
 
         foreach ($commentariesAndUser as $commentaryAndUser){
             $avatarUserForEachCommentaries->append(ProfileController::getUserAvatar($this->getDoctrine()->getRepository(Account::class)->find($commentaryAndUser['id']), $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir')));
         }
+
+
+        $notation = new ArrayObject(array());
+        $isFors = $this->getDoctrine()->getRepository(Project::class)->find($id)->getIsFors();
+        $noted = 0;
+        $likes = 0;
+        $dislikes = 0;
+        foreach ($isFors as $evaluation){
+            if($evaluation->getEvaluation()){
+                $likes++;
+            }
+            else{
+                $dislikes++;
+            }
+            if($evaluation->getIdAccount()->getId() == $this->getUser()->getId() && $evaluation->getEvaluation()){
+                $noted = 1;
+            }
+            if($evaluation->getIdAccount()->getId() == $this->getUser()->getId() && !$evaluation->getEvaluation()){
+                $noted = 2;
+            }
+        }
+        $notation->append($noted);
+        $notation->append($likes);
+        $notation->append($dislikes);
 
 
         return $this->render('detail/project.html.twig', [
@@ -69,8 +94,7 @@ class DetailController extends AbstractController
             'commentaries' => $commentariesAndUser,
             'avatarUserForEachCommentaries' => $avatarUserForEachCommentaries,
 
-            'countFor' => $this->getDoctrine()->getRepository(IsFor::class)->countVotesFor($id),
-            'countAgainst' => $this->getDoctrine()->getRepository(IsFor::class)->countVotesAgainst($id),
+            'notation' => $notation,
 
             'detailsAdminProjectForEachAdmin' => $detailsAdminProjectForEachAdmin,
             'avatarAdminForEachAdmin' => $avatarAdminForEachAdmin,

@@ -19,10 +19,9 @@ class IsForController extends AbstractController
     /**
      * @Route("/addLike/{idProject}", name="addLike")
      */
-    public function addLike($idProject)
+    public function addLike($idProject,Request $request)
     {
-        //TODO implement $this->getUser()
-        $like = $this->getDoctrine()->getRepository(IsFor::class)->findOneByLike(1, $idProject);
+        $like = $this->getDoctrine()->getRepository(IsFor::class)->findOneByLike($this->getUser()->getId(), $idProject);
         if($like){
             $isFor = $this->getDoctrine()->getRepository(IsFor::class)->findOneBy(["id"=>$like]);
             $em = $this->getDoctrine()->getManager();
@@ -30,7 +29,7 @@ class IsForController extends AbstractController
             $em->flush();
         }
         else{
-            $dislike = $this->getDoctrine()->getRepository(IsFor::class)->findOneByDislike(1, $idProject);
+            $dislike = $this->getDoctrine()->getRepository(IsFor::class)->findOneByDislike($this->getUser()->getId(), $idProject);
             if($dislike){
                 $isFor = $this->getDoctrine()->getRepository(IsFor::class)->findOneBy(["id"=>$dislike]);
                 $em = $this->getDoctrine()->getManager();
@@ -41,7 +40,7 @@ class IsForController extends AbstractController
 
             $isFor->setEvaluation(True);
             $isFor->setIdProject($this->getDoctrine()->getRepository(Project::class)->findOneBy(['id'=>$idProject]));
-            $isFor->setIdAccount($this->getDoctrine()->getRepository(Account::class)->findOneBy(["id"=>1]));
+            $isFor->setIdAccount($this->getUser());
 
 
             $em = $this->getDoctrine()->getManager();
@@ -49,7 +48,7 @@ class IsForController extends AbstractController
             $em->flush();
 
         }
-        return $this->redirectToRoute('allProjects');
+        return $this->redirect($request->get('url'));
 
     }
 
@@ -57,10 +56,9 @@ class IsForController extends AbstractController
     /**
      * @Route("/addDislike/{idProject}", name="addDislike")
      */
-    public function addDislike($idProject)
+    public function addDislike($idProject, Request $request)
     {
-        //TODO implement $this->getUser()
-        $dislike = $this->getDoctrine()->getRepository(IsFor::class)->findOneByDislike(1, $idProject);
+        $dislike = $this->getDoctrine()->getRepository(IsFor::class)->findOneByDislike($this->getUser()->getId(), $idProject);
         if($dislike){
             $isFor = $this->getDoctrine()->getRepository(IsFor::class)->findOneBy(["id"=>$dislike]);
             $em = $this->getDoctrine()->getManager();
@@ -68,7 +66,7 @@ class IsForController extends AbstractController
             $em->flush();
         }
         else{
-            $like = $this->getDoctrine()->getRepository(IsFor::class)->findOneByLike(1, $idProject);
+            $like = $this->getDoctrine()->getRepository(IsFor::class)->findOneByLike($this->getUser()->getId(), $idProject);
             if($like){
                 $isFor = $this->getDoctrine()->getRepository(IsFor::class)->findOneBy(["id"=>$like]);
                 $em = $this->getDoctrine()->getManager();
@@ -79,7 +77,7 @@ class IsForController extends AbstractController
 
             $isFor->setEvaluation(False);
             $isFor->setIdProject($this->getDoctrine()->getRepository(Project::class)->findOneBy(['id'=>$idProject]));
-            $isFor->setIdAccount($this->getDoctrine()->getRepository(Account::class)->findOneBy(["id"=>1]));
+            $isFor->setIdAccount($this->getUser());
 
 
             $em = $this->getDoctrine()->getManager();
@@ -87,7 +85,7 @@ class IsForController extends AbstractController
             $em->flush();
 
         }
-        return $this->redirectToRoute('allProjects');
+        return $this->redirect($request->get('url'));
 
     }
 }
