@@ -210,6 +210,14 @@ class ProfileController extends AbstractController
 
         $result = $tempPathBDD;
 
+        if(!$filesystem->exists($projectDir . "/public/uploads/")) {
+            $filesystem->mkdir($projectDir . "/public/uploads");
+        }
+
+        if($user->getIdMongo() == null) {
+            return null;
+        }
+
         if ($tempPathBDD == null || !$filesystem->exists($projectDir . "/public/" . $tempPathBDD)) {
             $oid = new ObjectId(); // create Mongo ObjectId
             $oid->unserialize($user->getIdMongo()); // unserialize user mongo avatar id
