@@ -57,7 +57,7 @@ class ProjectType extends AbstractType
                     "class" => "h3 ml-4 mb-0"
                 ],
                 "attr" => [
-                    "class" => "form-control"
+                    "class" => "form-label"
                 ],
                 'choice_label' => 'name',
                 'multiple' => true,

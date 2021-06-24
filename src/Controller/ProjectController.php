@@ -10,6 +10,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Knp\Component\Pager\PaginatorInterface;
 use App\Entity\Project;
+use App\Entity\RoleProject;
+use App\Form\ApplyType;
 use App\Form\ProjectType;
 use DateTime;
 
@@ -65,6 +67,14 @@ class ProjectController extends AbstractController
         else{
             $data = $this->getDoctrine()->getRepository(Project::class)->findAll();
         }
+
+        //foreach($data as $try){
+        //    foreach($try->getIsFors() as $notation){
+        //        if($notation->getEvaluation()){
+        //            
+        //        }
+        //    }
+        //}
 
         $projects = $paginator->paginate(
             $data,
@@ -139,7 +149,6 @@ class ProjectController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($project);
             $em->flush();
-            dump($project);
 
             //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
         }
@@ -256,28 +265,41 @@ class ProjectController extends AbstractController
 
 
     /**
-     * @Route("/applyToProject/{id}", name="applyToProject")
+     * @Route("/applyToProject/{idProject}", name="applyToProject")
      * @param Request $request
      * @return Response
      */
-    public function applyToProject(Request $request, $id): Response
+    public function applyToProject(Request $request, $idProject): Response
     { 
+        //TODO implement redirection after the creation of the project
         $apply = new Apply;
-        $roleProject = $this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => 1]);
-        $project=$this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $id]);
+
+        $roleProject = $this->getDoctrine()->getRepository(RoleProject::class)->findOneBy(['id' => 1]);
+        $project=$this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $idProject]);
+        $project->setAccount($this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]));        
 
         $apply->setIdProject($project);
-        $apply->setIdAccount($this->getUser());
+        //here
+        //$apply->setIdAccount($this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => 1]));
         $apply->setRoleProject($roleProject);
 
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($apply);
-        $em->flush();
+        $form = $this->createForm(ApplyType::class, $apply);
+        $form->handleRequest($request);
 
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($apply);
+            $em->flush();
 
+            //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
+        }
 
-        return $this->render('test.html.twig', [
-            'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0])
+        dump($project);
+
+        return $this->render('project/applyProject.html.twig', [
+            'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
+            'project' => $project,
+            'form' => $form->createView()
         ]);
     
     
