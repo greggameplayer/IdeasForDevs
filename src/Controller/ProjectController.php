@@ -67,6 +67,14 @@ class ProjectController extends AbstractController
             $data = $this->getDoctrine()->getRepository(Project::class)->findAll();
         }
 
+        //foreach($data as $try){
+        //    foreach($try->getIsFors() as $notation){
+        //        if($notation->getEvaluation()){
+        //            
+        //        }
+        //    }
+        //}
+
         $projects = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
@@ -271,13 +279,15 @@ class ProjectController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($apply);
             $em->flush();
+
+            //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
         }
+
 
         return $this->render('project/applyProject.html.twig', [
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
             'project' => $project,
             'form' => $form->createView()
-
         ]);
 
     }
