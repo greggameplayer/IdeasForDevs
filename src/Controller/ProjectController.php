@@ -54,7 +54,7 @@ class ProjectController extends AbstractController
 
 
     /**
-     * @Route("/allProjects", name="allProjects")
+     * @Route("/user/allProjects", name="allProjects")
      * @param Request $request
      * @return Response
      */
@@ -123,7 +123,7 @@ class ProjectController extends AbstractController
     }
 
     /**
-     * @Route("/createProject", name="createProject")
+     * @Route("/user/createProject", name="createProject")
      * @param Request $request
      * @return Response
      */
@@ -147,6 +147,17 @@ class ProjectController extends AbstractController
             $em->persist($project);
             $em->flush();
 
+            $apply = new Apply();
+            $roleProject = $this->getDoctrine()->getRepository(RoleProject::class)->findOneBy(['id' => 4]);
+
+            $apply->setRoleProject($roleProject);
+            $apply->setIdAccount($this->getUser());
+            $apply->setIdProject($project);
+
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($apply);
+            $em->flush();
+
             //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
         }
         return $this->render('project/createProject.html.twig', [
@@ -156,7 +167,7 @@ class ProjectController extends AbstractController
     }
 
     /**
-     * @Route("/updateProject/{id}", name="updateProject")
+     * @Route("/user/updateProject/{id}", name="updateProject")
      * @param Request $request
      * @return Response
      */
@@ -188,7 +199,7 @@ class ProjectController extends AbstractController
     }
 
     /**
-     * @Route("/delProject/{id}", name="delProject")
+     * @Route("/user/delProject/{id}", name="delProject")
      */
     public function delProject($id)
     {
@@ -207,7 +218,7 @@ class ProjectController extends AbstractController
     }
 
     /**
-     * @Route("/getMemberProject/{id}", name="getMemberProject")
+     * @Route("/user/getMemberProject/{id}", name="getMemberProject")
      */
     public function getMemberProject($id)
     {        
@@ -254,7 +265,7 @@ class ProjectController extends AbstractController
 
 
     /**
-     * @Route("/applyToProject/{idProject}", name="applyToProject")
+     * @Route("/user/applyToProject/{idProject}", name="applyToProject")
      * @param Request $request
      * @return Response
      */
@@ -293,7 +304,7 @@ class ProjectController extends AbstractController
     }
 
     /**
-     * @Route("/updateRoleProject/{idProject}/{idApply}", name="updateRoleProject")
+     * @Route("/user/updateRoleProject/{idProject}/{idApply}", name="updateRoleProject")
      * @param Request $request
      * @return Response
      */
@@ -319,7 +330,7 @@ class ProjectController extends AbstractController
     }
 
     /**
-     * @Route("/delApply/{idApply}", name="delApply")
+     * @Route("/user/delApply/{idApply}", name="delApply")
      */
     public function delApply($idApply)
     {  

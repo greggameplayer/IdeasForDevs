@@ -17,7 +17,7 @@ class IsForController extends AbstractController
 {
 
     /**
-     * @Route("/addLike/{idProject}", name="addLike")
+     * @Route("/user/addLike/{idProject}", name="addLike")
      */
     public function addLike($idProject,Request $request)
     {
@@ -54,7 +54,7 @@ class IsForController extends AbstractController
 
 
     /**
-     * @Route("/addDislike/{idProject}", name="addDislike")
+     * @Route("/user/addDislike/{idProject}", name="addDislike")
      */
     public function addDislike($idProject, Request $request)
     {
