@@ -1,41 +1,45 @@
-<nav class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top" id="mainNav">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/#page-top">IdeasForDevs</a>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ms-auto">
-                <!--
-                <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#portfolio">Portfolio</a></li>
-                <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#about">About</a></li>
-                <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#contact">Contact</a></li>
-                -->
-            </ul>
-        </div>
-        <div>
-            {% if is_granted('IS_ANONYMOUS') %}
-                <a class="btn btn-secondary" type="button" href="{{ path('app_login') }}">
-                    {% if locale is defined %}
-                        {% trans from 'messages' into locale %}
-                            signinSignup
-                        {% endtrans %}
-                    {% else %}
-                        Sign in / Sign up
-                    {% endif %}
-                </a>
-            {% else %}
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-cog"></i>
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="position: absolute; right: 0; padding-bottom: 0;">
-                        <a class="dropdown-item h5" href="{{ path('profile') }}"><i class="fas fa-user"></i> Mon profil</a>
-                        <a class="dropdown-item text-danger h5" href="{{ path('app_logout') }}"><i class="fas fa-user-slash"></i> Se déconnecter</a>
-                    </div>
-                </div>
+<nav class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top" id="mainNav" style="padding-left: 1em;">
+    <a class="navbar-brand" href="/#page-top">IdeasToDev</a>
+    <button class="navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded" type="button"
+            data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive"
+            aria-expanded="false" aria-label="Toggle navigation" style="margin-right: 2em;">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ms-auto">
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/allProjects">Projets</a>
+                </li>
+                <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded"
+                                                     href="/allProjectsCandidate">Candidature</a></li>
+                <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="/manageProjects">Gestion
+                        de projets</a></li>
             {% endif %}
-        </div>
-        <button class="navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="fas fa-bars"></i>
-        </button>
+            {% if is_granted('IS_ANONYMOUS') %}
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded" href="{{ path('app_login') }}">
+                        {% if locale is defined %}
+                            {% trans from 'messages' into locale %}
+                                signinSignup
+                            {% endtrans %}
+                        {% else %}
+                            Sign in / Sign up
+                        {% endif %}
+                    </a>
+                </li>
+            {% else %}
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded" href="{{ path('profile') }}"><i
+                                class="fas fa-user"></i> Mon
+                        profil</a>
+                </li>
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded text-danger" href="{{ path('app_logout') }}"><i
+                                class="fas fa-user-slash"></i> Se déconnecter</a>
+                </li>
+            {% endif %}
+        </ul>
     </div>
 
 </nav>
