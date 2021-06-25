@@ -45,6 +45,11 @@ class Project
     private $idMongo;
 
     /**
+     * @ORM\Column(type="string", length=800, nullable=true)
+     */
+    private $tempImage;
+
+    /**
      * @ORM\Column(type="integer")
      */
     private $status;
@@ -148,6 +153,18 @@ class Project
     public function setIdMongo(?string $idMongo): self
     {
         $this->idMongo = $idMongo;
+
+        return $this;
+    }
+
+    public function getTempImage(): ?string
+    {
+        return $this->tempImage;
+    }
+
+    public function setTempImage(?string $tempImage): self
+    {
+        $this->tempImage = $tempImage;
 
         return $this;
     }

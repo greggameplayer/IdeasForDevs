@@ -4,9 +4,11 @@ namespace App\Controller;
 
 
 use App\Document\Avatar;
+use App\Document\ProjectImage;
 use App\Entity\Account;
 use App\Entity\Job;
 use App\Entity\JobsAccount;
+use App\Entity\Project;
 use DateTime;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\MongoDBException;
@@ -210,6 +212,14 @@ class ProfileController extends AbstractController
 
         $result = $tempPathBDD;
 
+        if(!$filesystem->exists($projectDir . "/public/uploads/")) {
+            $filesystem->mkdir($projectDir . "/public/uploads");
+        }
+
+        if($user->getIdMongo() == null) {
+            return null;
+        }
+
         if ($tempPathBDD == null || !$filesystem->exists($projectDir . "/public/" . $tempPathBDD)) {
             $oid = new ObjectId(); // create Mongo ObjectId
             $oid->unserialize($user->getIdMongo()); // unserialize user mongo avatar id
@@ -222,6 +232,43 @@ class ProfileController extends AbstractController
                 $result = 'uploads/' . basename($tempfile);
                 $user->setTempAvatar($result);
                 $manager->persist($user);
+                $manager->flush();
+            } catch (MongoDBException $e) {
+                $result = null;
+            } finally {
+                fclose($stream); // close the file stream
+            }
+        }
+
+        return $result;
+    }
+
+    public static function getProjectImage(Project $project, DocumentManager $dm, Filesystem $filesystem, ObjectManager $manager, string $projectDir): ?string
+    {
+        $tempPathBDD = $project->getTempImage();
+
+        $result = $tempPathBDD;
+
+        if(!$filesystem->exists($projectDir . "/public/uploads/")) {
+            $filesystem->mkdir($projectDir . "/public/uploads");
+        }
+
+        if($project->getIdMongo() == null) {
+            return null;
+        }
+
+        if ($tempPathBDD == null || !$filesystem->exists($projectDir . "/public/" . $tempPathBDD)) {
+            $oid = new ObjectId(); // create Mongo ObjectId
+            $oid->unserialize($project->getIdMongo()); // unserialize user mongo avatar id
+
+            $tempfile = $filesystem->tempnam($projectDir . "/public/uploads", "pjt", '.png'); // create a temporary file in /public/uploads to store and use the avatar image
+            $filesystem->chmod($tempfile, 0777); // give max permission on this temp file
+            $stream = fopen($tempfile, "w+"); // open a file stream to write this temporary file
+            try {
+                $dm->getDocumentBucket(ProjectImage::class)->downloadToStream($oid, $stream); // download the user avatar image through mongodb with it's id and store it in the temp file
+                $result = 'uploads/' . basename($tempfile);
+                $project->setTempImage($result);
+                $manager->persist($project);
                 $manager->flush();
             } catch (MongoDBException $e) {
                 $result = null;

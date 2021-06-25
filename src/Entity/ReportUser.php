@@ -47,7 +47,7 @@ class ReportUser
     /**
      * @ORM\Column(type="boolean")
      */
-    private $isTreated;
+    private $isTreated = false;
 
     public function getId(): ?int
     {
