@@ -64,7 +64,7 @@ class ProjectRepository extends ServiceEntityRepository
 
         $sql = "
         SELECT project.id, project.name, project.repo, project.description, project.date_creation, project.id_mongo, status.status
-        FROM project INNER JOIN status ON project.status_id = status.id
+        FROM project INNER JOIN status ON project.status = status.id
         WHERE project.id = :id";
 
         $stmt = $conn->prepare($sql);

@@ -64,7 +64,7 @@ class ApplyRepository extends ServiceEntityRepository
         return $stmt->executeQuery(['id' => $id])->fetchOne();
     }
 
-    public function IdOfAdmins($id) :array
+    public function IdOfAdmins($idProject, $idUserConnected) :array
     {
         $conn = $this->getEntityManager()->getConnection();
 
@@ -72,14 +72,15 @@ class ApplyRepository extends ServiceEntityRepository
         SELECT apply.id_account_id
         FROM apply INNER JOIN role_project ON apply.role_project_id = role_project.id
         INNER JOIN account ON apply.id_account_id = account.id
-        WHERE apply.id_project_id = :id
+        WHERE apply.id_project_id = :idProject
         AND role_project.name = 'Administrateur'
         AND account.is_verified = 1
+AND account.id != :idUserConnected
         ";
 
         $stmt = $conn->prepare($sql);
 
-        return $stmt->executeQuery(['id' => $id])->fetchFirstColumn();
+        return $stmt->executeQuery(['idProject' => $idProject, 'idUserConnected' => $idUserConnected])->fetchFirstColumn();
     }
 
     public function countProjectParticipation($id)
@@ -102,7 +103,7 @@ class ApplyRepository extends ServiceEntityRepository
 
         $sql = "
         SELECT COUNT(apply.id_project_id)
-        FROM apply INNER JOIN Project ON apply.id_project_id = project.id INNER JOIN status ON project.status_id = status.id
+        FROM apply INNER JOIN Project ON apply.id_project_id = project.id INNER JOIN status ON project.status = status.id
         WHERE apply.id_account_id = :id
         AND status.status = 'Abouti'";
 
@@ -110,6 +111,5 @@ class ApplyRepository extends ServiceEntityRepository
 
         return $stmt->executeQuery(['id' => $id])->fetchOne();
     }
-
 
 }
