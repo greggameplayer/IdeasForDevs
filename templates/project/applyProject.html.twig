@@ -3,7 +3,8 @@
 {% block title %}Candidature{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('css/applyProject.css') }}" type="text/css"/>
+    <link rel="stylesheet" href="{{ asset('css/applyProject.css') }}" type="text/css"/>.
+    <link rel="stylesheet" href="{{ asset('css/breakpointWidth.css') }}" type="text/css"/>
 {% endblock %}
 
 
@@ -20,11 +21,11 @@
     </style>
 
     
-    <section class="page-section">
-        <div class="card d-flex" style="margin-bottom: 1em; margin-top:1em; margin-left:1em; margin-right:1em">
+    <section class="" style="padding-top: 6rem; padding-bottom: 1rem">
+        <div class="card d-flex" style="margin-top:1.5em; margin-left:1em; margin-right:1em">
                 <div class="card-body d-flex flex-row">
                     <div class="card-body d-flex flex-row flex-wrap">
-                        <div class="w-sm-75"style="margin-right: 1em; margin-left: 0; margin-top: auto; margin-bottom: auto max:width:5em">
+                        <div class="w-sm-100 w-xs-100 d-flex flex-row justify-content-center"style="margin-right: 1em; margin-left: 0; margin-top: auto; margin-bottom: auto max:width:5em">
                             <img src="{{ asset('images/noIMG.jpg') }}" class="img">
                         </div>
                         <div>
@@ -47,8 +48,12 @@
                         <a data-toggle="tooltip" data-placement="top" title="Signaler le projet" href="{{ path( 'applyToProject', {'idProject': project.id, } ) }}"><i class="far fa-flag text-danger" styel=" margin-left: auto; "></i></a>
                     </div>
                 </div>
+            <div class="card-body flex-row" style="width:100%" align="center">
+                <hr style="width: 95%; ">    
+            </div>
 
             <div class="card-body flex-row" style="margin: 1em; width:100%" align="center">
+
                 {{ form_start(form, {'attr':{'class':'w-75 d-flex flex-column'}} )}}
                 {{ form_row(form.description) }}
                 <div class="mt-4 d-flex justify-content-center w-100 button">

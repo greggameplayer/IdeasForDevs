@@ -279,8 +279,7 @@ class ProjectController extends AbstractController
         $project->setAccount($this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]));        
 
         $apply->setIdProject($project);
-        //here
-        //$apply->setIdAccount($this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => 1]));
+        $apply->setIdAccount($this->getUser());
         $apply->setRoleProject($roleProject);
 
         $form = $this->createForm(ApplyType::class, $apply);
@@ -291,7 +290,7 @@ class ProjectController extends AbstractController
             $em->persist($apply);
             $em->flush();
 
-            //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
+            //return $this->redirectToRoute('detailProject'); Ajouter la redirection vers le projet
         }
 
 
