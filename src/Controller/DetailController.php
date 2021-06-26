@@ -102,7 +102,6 @@ class DetailController extends AbstractController
         }
 
 
-
         //Candidat and Member
         if($candidatureUserConnected != null && ($candidatureUserConnected->getRoleProject()->getName() == "Membre" || $candidatureUserConnected->getRoleProject()->getName() == "En attente" || $candidatureUserConnected->getRoleProject()->getName() == "Refusé")){
             return $this->render('detail/projectCandidat.html.twig', [
@@ -145,7 +144,8 @@ class DetailController extends AbstractController
                 'countProjectParticipationForEachCandidate' => $countProjectParticipationForEachCandidate,
                 'countProjectSuccessfullForEachCandidate' => $countProjectSuccessfullForEachCandidate,
 
-                'notation' => $notation
+                'notation' => $notation,
+                'adminAlone' => count($IdsOfAdmins)==0
             ]);
         }
         //without apply
