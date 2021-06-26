@@ -2,25 +2,25 @@
 
 namespace App\Repository;
 
-use App\Entity\Skill;
+use App\Entity\Status;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Skill|null find($id, $lockMode = null, $lockVersion = null)
- * @method Skill|null findOneBy(array $criteria, array $orderBy = null)
- * @method Skill[]    findAll()
- * @method Skill[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Status|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Status|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Status[]    findAll()
+ * @method Status[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SkillRepository extends ServiceEntityRepository
+class StatusRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Skill::class);
+        parent::__construct($registry, Status::class);
     }
 
     // /**
-    //  * @return Skill[] Returns an array of Skill objects
+    //  * @return Status[] Returns an array of Status objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class SkillRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Skill
+    public function findOneBySomeField($value): ?Status
     {
         return $this->createQueryBuilder('s')
             ->andWhere('s.exampleField = :val')
@@ -47,15 +47,4 @@ class SkillRepository extends ServiceEntityRepository
         ;
     }
     */
-
-    public function findAllChoice()
-    {
-        $conn = $this->getEntityManager()->getConnection();
-
-        $sql = "SELECT skill.name FROM `skill`";
-
-        $stmt = $conn->prepare($sql);
-
-        return $stmt->executeQuery()->fetchAllAssociative();
-    }
 }

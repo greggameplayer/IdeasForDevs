@@ -1,0 +1,270 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du projet{% endblock %}
+
+{% block body %}
+    <style>
+        .circular--landscape {
+            display: inline-block;
+            position: relative;
+            width: 100px;
+            height: 100px;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+
+        .circular--landscape--big {
+            display: inline-block;
+            position: relative;
+            width: 200px;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+    </style>
+
+
+    <div class="flex-column page-section">
+        <div class="d-flex flex-row flex-wrap-reverse">
+            <div class="d-flex flex-column"
+                 style="width: 40em; min-width: 20em; margin: 2em">
+                {% if detailsProject.id_mongo is not null %}
+                    <img src="{{ asset(imgProject) }}" class="w-100 h-100"
+                         style="object-fit: cover" alt="Erreur de chargement de l'image">
+                {% else %}
+                    <img src="{{ asset('images/noIMG.jpg') }}" style="object-fit: cover"
+                         alt="Erreur de chargement de l'image">
+                {% endif %}
+                <div class="d-flex flex-row justify-content-center w-100 border mt-3">
+                    <div class="card-body d-flex justify-content-center my-auto" style="max-width: 15em">
+                        <form class="flex-column mx-5"
+                              action="{{ path( 'addLike', {'idProject': detailsProject.id } ) }}" method="post">
+                            <input type="hidden" name="url" value="/project/{{ detailsProject.id }}">
+                            <button type="submit" data-toggle="tooltip" data-placement="top" title="J'aime"
+                                    style="border: none; background: white"><i
+                                        class="fas fa-arrow-up fa-4x {% if notation[0] == 1 %} text-primary {% else %} text-dark{% endif %}"></i>
+                            </button>
+                            <p class="text-center h4 {% if notation[0] == 1 %} text-primary {% else %} text-dark{% endif %}"
+                               style="font-weight: bold; margin-bottom: 0">{{ notation[1] }}</p>
+                        </form>
+                        <form class="flex-column mx-5"
+                              action="{{ path( 'addDislike', {'idProject': detailsProject.id}) }}" method="post">
+                            <input type="hidden" name="url" value="/project/{{ detailsProject.id }}">
+                            <button type="submit" data-toggle="tooltip" data-placement="top" title="Je n'aime pas"
+                                    style="border: none; background: white"><i
+                                        class="fas fa-arrow-down fa-4x {% if notation[0] == 2 %} text-danger {% else %} text-dark{% endif %} "></i>
+                            </button>
+                            <p class="text-center h4 {% if notation[0] == 2 %} text-danger {% else %} text-dark{% endif %}">{{ notation[2] }}</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-column border justify-content-center"
+                 style="width: 70em; min-width: 10em; margin: 2em">
+                <div class="d-flex flex-row">
+                    <div class="border my-3 d-flex flex-column" style="width: 50%; margin-left: 1em; margin-right: 0.5em">
+                        <div class="d-flex flex-row">
+                            <h2><u>Projet:</u></h2>
+                            <a href="{{ path('projectReport', {'id':detailsProject.id}) }}"
+                               class="justify-content-end mt-3" title="Signaler le projet"
+                               style="margin-left: auto; margin-right: 1.6em"><i
+                                        class="far fa-flag text-danger fa-2x"></i></a>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <h3 class="mx-2 text-primary">{{ detailsProject.name }}</h3>
+                            <p>({{ detailsProject.status }})</p>
+                        </div>
+                        <div class="">
+                            <h5>Date de création:</h5>
+                            <p class="mx-2">{{ detailsProject.date_creation|date('d-m-Y') }}
+                                à {{ detailsProject.date_creation|date('H') }}
+                                h{{ detailsProject.date_creation|date('i') }}</p>
+                            <h5>Description:</h5>
+                            <p class="mx-2 text-break">{{ detailsProject.description }}</p>
+                            <div class="mx-5 my-2 border">
+                                <h4>Compétence(s) voulue(s):</h4>
+                                {% for skill in skillsNeeded %}
+                                    <p class="mx-2">- {{ skill }}</p>
+                                {% endfor %}
+                            </div>
+                            <div class="mx-5 my-2 mb-4 border">
+                                <h4>Role(s) voulu(s):</h4>
+                                {% for job in jobsNeeded %}
+                                    <p class="mx-2">- {{ job }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border my-3 d-flex flex-column" style="width: 50%; margin-right: 1em; margin-left: 0.5em">
+                            <h2><u>Votre candidature:</u></h2>
+                            <div class="h4 mt-3">Role/État:</div>
+                            <p class="text-center h1 {% if candidatureUserConnected.roleProject.name == 'Refusé' %} text-danger {% endif %}{% if candidatureUserConnected.roleProject.name == 'En attente' %} text-warning  {% endif %}{% if candidatureUserConnected.roleProject.name == 'Membre' %} text-primary {% endif %}">{{ candidatureUserConnected.roleProject.name }}</p>
+                            <form action="{{ path('modifyApplication', {'idProject': detailsProject.id}) }}" method="POST"
+                                  class="d-flex flex-column">
+                                <label for="description" class="h5 mt-3"><u>Votre description:</u></label>
+                                <textarea id="description" name="description" class="form-control mx-auto" maxlength="499"
+                                          placeholder="Entrez ici votre description" style="width: 95%; height: 7em; max-height: 7em">{{ candidatureUserConnected.description }}</textarea>
+                                <button type="submit" class="btn btn-outline-primary add mx-5 my-2"><i class="fas fa-check"></i> Valider</button>
+                            </form>
+                            <a href="{{ path('delApplication',  {'idProject': detailsProject.id}) }}" class="btn btn-danger w-50 add mx-auto mt-auto mb-5"><i
+                                        class="fas fa-user-minus"></i> {% if candidatureUserConnected.roleProject.name == 'Membre' %}Se retirer du projet{% elseif candidatureUserConnected.roleProject.name == 'Refusé' %}Supprimer ma candidature{% endif %}{% if candidatureUserConnected.roleProject.name == 'En attente' %}Retirer ma candidature{% endif %}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-column mt-3">
+            {% if detailsAdminProjectForEachAdmin|length != 0  %}
+            <h2 class="mx-3"><u>Administrateur(s):</u></h2>
+                {% for i in 0..detailsAdminProjectForEachAdmin|length-1 %}
+                    <div class="d-flex flex-column border" style="margin: 2em">
+                        <div class="d-flex flex-row">
+                            <div class="m-3 justify-content-center d-flex">
+                                <div class="circular--landscape--big">
+                                    {% if avatarAdminForEachAdmin[i] is not null %}
+                                        <img src="{{ asset(avatarAdminForEachAdmin[i]) }}" class="w-100 h-100"
+                                             style="object-fit: cover" alt="Erreur de chargement de l'image">
+                                    {% else %}
+
+                                        <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
+                                             style="object-fit: cover" alt="Erreur de chargement de l'image">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column w-100">
+                                <div class="d-flex flex-row mw-100">
+                                    <h3 class=" text-primary">
+                                        <u>{{ detailsAdminProjectForEachAdmin[i].firstname }} {{ detailsAdminProjectForEachAdmin[i].lastname }}</u>
+                                    </h3>
+                                    <p class="mx-2">(inscrit
+                                        le {{ detailsAdminProjectForEachAdmin[i].subscribe_date|date('d-m-Y') }})</p>
+                                    <a href="{{ path('userReport', {'id':detailsAdminProjectForEachAdmin[i].id}) }}"
+                                       class="justify-content-end mt-3" title="Signaler l'administrateur"
+                                       style="margin-left: auto; margin-right: 1.6em"><i
+                                                class="far fa-flag text-danger fa-2x"></i></a>
+                                </div>
+                                <h4>Rôle:</h4>
+                                <p class="mx-2">{{ detailsAdminProjectForEachAdmin[i].name }}</p>
+                            </div>
+                        </div>
+                        <div class="border mx-5 my-2 mw-100">
+                            <h4>Compétence(s):</h4>
+                            {% for skill in skillsForEachAdmin[i] %}
+                                <p class="mx-2">- {{ skill }}</p>
+                            {% endfor %}
+                        </div>
+                        <div class="d-flex flex-row border mx-5 my-2 mb-4 flex-wrap mw-100">
+                            <div class="d-flex flex-column mw-100">
+                                <h4>Historique:</h4>
+                                <p class="mx-2">Nombre de projet proposé :
+                                    <u>{{ countProjectAsAdminForEachAdmin[i] }}</u></p>
+                                <p class="mx-2">Nombre de participation à des projets:
+                                    <u>{{ countProjectParticipationForEachAdmin[i] }}</u></p>
+                                <p class="mx-2">Nombre de projet abouti:
+                                    <u>{{ countProjectSuccessfullForEachAdmin[i] }}</u></p>
+                            </div>
+                            <div class="d-flex flex-column align-content-end my-auto mx-auto"
+                                 style="width: 60%; margin: 2em">
+                                <a href="{{ path('detailProject',  {'id': 1}) }}"
+                                   class="btn btn-outline-primary mw-100 add"><i class="fas fa-history"></i> Historique</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <div class="d-flex flex-column mt-3" style=" margin: 2em;">
+                <h2 class="mx-3"><u>Commentaire(s):</u></h2>
+                <div class="d-flex flex-column  border"
+                     style="max-height: 40em; overflow-y: auto;">
+                    {% for i in 0..commentaries|length-1 %}
+                        {% if commentaries[i].id != app.user.id %}
+                            <div class="d-flex flex-column border" style="margin: 1em">
+                                <div class="d-flex flex-row">
+                                    <div class="m-3 justify-content-center d-flex">
+                                        <div class="circular--landscape">
+                                            {% if avatarUserForEachCommentaries[i] is not null %}
+                                                <img src="{{ asset(avatarUserForEachCommentaries[i]) }}"
+                                                     class="w-100 h-100"
+                                                     style="object-fit: cover" alt="Erreur de chargement de l'image">
+                                            {% else %}>
+                                                <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
+                                                     style="object-fit: cover" alt="Erreur de chargement de l'image">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column w-100">
+                                        <div class="d-flex flex-row mw-100">
+                                            <h4 class=" text-primary">
+                                                <u>{{ commentaries[i].firstname }} {{ commentaries[i].lastname }}</u>
+                                            </h4>
+                                            <a href="{{ path('userReport', {'id':commentaries[i].idUser}) }}"
+                                               class="justify-content-end mt-3" title="Signaler l'utilisateur"
+                                               style="margin-left: auto; margin-right: 1.6em"><i
+                                                        class="far fa-flag text-danger fa-2x"></i></a>
+                                        </div>
+                                        <p><u>{{ commentaries[i].date_comment|date('d-m-Y') }}
+                                                à {{ commentaries[i].date_comment|date('H') }}
+                                                h{{ commentaries[i].date_comment|date('i') }}</u></p>
+
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row border mb-3 m-3">
+                                    <p class="m-3">{{ commentaries[i].comment }}</p>
+                                    <a href="{{ path('commentReport', {'id':commentaries[i].id}) }}"
+                                       class="justify-content-end mt-3" title="Signaler le commentaire"
+                                       style="margin-left: auto; margin-right: 1.6em"><i
+                                                class="far fa-flag text-danger fa-2x"></i></a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% set commented = 0 %}
+                {% for commentary in commentaries %}
+                    {% if commentary.id == app.user.id %}
+                        <div class="mw-100 mx-3 my-2">
+                            <form action="{{ path('UpdateCommente',  {'id': detailsProject.id}) }}" method="POST"
+                                  class="d-flex flex-column">
+                                <label for="commentaire" class="h5"><u>Votre commentaire:</u></label>
+                                <textarea id="commentaire" name="commentaire" class="form-control" maxlength="499"
+                                          placeholder="Entrez ici votre commentaire">{{ commentary.comment }}</textarea>
+                                <button type="submit" class="btn btn-outline-primary mw-100 add mx-5 my-2"><i
+                                            class="fas fa-comment-alt"></i> Valider la
+                                    modification
+                                </button>
+                            </form>
+                        </div>
+                        {% set commented = 1 %}
+                    {% endif %}
+                {% endfor %}
+                {% if commented == 0 %}
+                    <div class="mw-100 mx-3 my-2">
+                        <form action="{{ path('commente', {'id': detailsProject.id}) }}" method="POST"
+                              class="d-flex flex-column">
+                            <label for="commentaire" class="h5"><u>Votre commentaire:</u></label>
+                            <textarea id="commentaire" name="commentaire" class="form-control" maxlength="499"
+                                      placeholder="Entrez ici votre commentaire"></textarea>
+                            <button type="submit" class="btn btn-outline-primary mw-100 add mx-5 my-2"><i
+                                        class="fas fa-comment-alt"></i> Commenter
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% if candidatureUserConnected.roleProject.name == 'Membre' or candidatureUserConnected.roleProject.name == 'Administrateur' %}
+        <div class="d-flex flex-row mw-100 mx-3 justify-content-center">
+            <a href="{{ path('detailProject',  {'id': 1}) }}" class="btn btn-primary w-25 add mx-auto"><i
+                        class="fas fa-list-ul"></i> Liste des membres</a>
+            <a href="{{ path('detailProject',  {'id': 1}) }}" class="btn btn-primary w-25 add mx-auto"><i
+                        class="fas fa-comments"></i> Espace Discussion</a>
+        </div>
+        {% else %}
+            <div class="d-flex flex-row mw-100 mx-3 justify-content-center">
+                <button class="btn btn-danger w-25 add mx-auto" disabled><i
+                            class="fas fa-list-ul"></i> Liste des membres</button>
+                <button class="btn btn-danger w-25 add mx-auto" disabled><i
+                            class="fas fa-comments"></i> Espace Discussion</button>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

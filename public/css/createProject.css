@@ -1,0 +1,4 @@
+#project_skillsNeeded{
+    display: flex;
+    flex-direction: column;
+}

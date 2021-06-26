@@ -47,4 +47,44 @@ class ProjectRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findByName($value)
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.name LIKE :val')
+            ->setParameter('val', "%$value%")
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function detailsProject($id) :array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT project.id, project.name, project.repo, project.description, project.date_creation, project.id_mongo, status.status
+        FROM project INNER JOIN status ON project.status = status.id
+        WHERE project.id = :id";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['id' => $id])->fetchAllAssociative()[0];
+    }
+
+    public function skillsAndJobsNeeded($id) :array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT project.skills_needed, project.job_needed
+        FROM project
+        WHERE project.id = :id";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['id' => $id])->fetchAllAssociative()[0];
+    }
+
+
 }
