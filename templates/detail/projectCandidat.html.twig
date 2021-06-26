@@ -98,7 +98,7 @@
                     <div class="border my-3 d-flex flex-column" style="width: 50%; margin-right: 1em; margin-left: 0.5em">
                             <h2><u>Votre candidature:</u></h2>
                             <div class="h4 mt-3">Role/État:</div>
-                            <p class="text-center h1 {% if candidatureUserConnected.roleProject.name == 'Administrateur' %}text-success{% elseif candidatureUserConnected.roleProject.name == 'Refusé' %}text-danger {% endif %}{% if candidatureUserConnected.roleProject.name == 'En attente' %} text-warning  {% endif %}{% if candidatureUserConnected.roleProject.name == 'Membre' %} text-primary {% endif %}">{{ candidatureUserConnected.roleProject.name }}</p>
+                            <p class="text-center h1 {% if candidatureUserConnected.roleProject.name == 'Refusé' %} text-danger {% endif %}{% if candidatureUserConnected.roleProject.name == 'En attente' %} text-warning  {% endif %}{% if candidatureUserConnected.roleProject.name == 'Membre' %} text-primary {% endif %}">{{ candidatureUserConnected.roleProject.name }}</p>
                             <form action="{{ path('modifyApplication', {'idProject': detailsProject.id}) }}" method="POST"
                                   class="d-flex flex-column">
                                 <label for="description" class="h5 mt-3"><u>Votre description:</u></label>
@@ -106,8 +106,8 @@
                                           placeholder="Entrez ici votre description" style="width: 95%; height: 7em; max-height: 7em">{{ candidatureUserConnected.description }}</textarea>
                                 <button type="submit" class="btn btn-outline-primary add mx-5 my-2"><i class="fas fa-check"></i> Valider</button>
                             </form>
-                            <a href="{{ path('detailProject',  {'id': 1}) }}" class="btn btn-danger w-50 add mx-auto mt-auto mb-5"><i
-                                        class="fas fa-user-minus"></i> {% if candidatureUserConnected.roleProject.name == 'Administrateur' or candidatureUserConnected.roleProject.name == 'Membre' %}Ce retirer du projet{% elseif candidatureUserConnected.roleProject.name == 'Refusé' %}Supprimer ma candidature{% endif %}{% if candidatureUserConnected.roleProject.name == 'En attente' %}Retirer ma candidature{% endif %}</a>
+                            <a href="{{ path('delApplication',  {'idProject': detailsProject.id}) }}" class="btn btn-danger w-50 add mx-auto mt-auto mb-5"><i
+                                        class="fas fa-user-minus"></i> {% if candidatureUserConnected.roleProject.name == 'Membre' %}Se retirer du projet{% elseif candidatureUserConnected.roleProject.name == 'Refusé' %}Supprimer ma candidature{% endif %}{% if candidatureUserConnected.roleProject.name == 'En attente' %}Retirer ma candidature{% endif %}</a>
                     </div>
                 </div>
             </div>

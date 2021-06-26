@@ -218,4 +218,45 @@ class DetailController extends AbstractController
 
         return $this->redirectToRoute('detailProject', ["id" => $idProject]);
     }
+
+    /**
+     * @Route("/acceptApplication/{idProject}/{idUser}", name="acceptApplication")
+     */
+    public function acceptApplication($idProject, $idUser): Response
+    {
+        $apply = $this->getDoctrine()->getRepository(Apply::class)->findOneBy(['idProject' => $idProject, 'idAccount' => $idUser]);
+        $apply->setRoleProject($this->getDoctrine()->getRepository(RoleProject::class)->findOneBy(['name' => "Membre"]));
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($apply);
+        $em->flush();
+
+        return $this->redirectToRoute('detailProject', ["id" => $idProject]);
+    }
+
+    /**
+     * @Route("/refuseApplication/{idProject}/{idUser}", name="refuseApplication")
+     */
+    public function refuseApplication($idProject, $idUser): Response
+    {
+        $apply = $this->getDoctrine()->getRepository(Apply::class)->findOneBy(['idProject' => $idProject, 'idAccount' => $idUser]);
+        $apply->setRoleProject($this->getDoctrine()->getRepository(RoleProject::class)->findOneBy(['name' => "Refusé"]));
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($apply);
+        $em->flush();
+
+        return $this->redirectToRoute('detailProject', ["id" => $idProject]);
+    }
+
+    /**
+     * @Route("/delApplication/{idProject}", name="delApplication")
+     */
+    public function delApplication($idProject): Response
+    {
+        $apply = $this->getDoctrine()->getRepository(Apply::class)->findOneBy(['idProject' => $idProject, 'idAccount' => $this->getUser()]);
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($apply);
+        $em->flush();
+
+        return $this->redirectToRoute('detailProject', ["id" => $idProject]);
+    }
 }

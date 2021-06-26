@@ -127,10 +127,10 @@
                                         <p class="mx-2 mw-100 text-break">{{ candidatureOfAllUsers[i].description }}</p>
                                     </div>
                                     <div class="d-flex flex-column mw-100 mx-auto">
-                                        <a href="{{ path('detailProject',  {'id': 1}) }}"
+                                        <a href="{{ path('acceptApplication', {'idProject': detailsProject.id, 'idUser': candidatureOfAllUsers[i].idAccount.id}) }}"
                                            class="btn btn-primary add" style="margin-bottom: 0.5em; min-width: 12em"><i
                                                     class="fas fa-user-check"></i> Accepter</a>
-                                        <a href="{{ path('detailProject',  {'id': 1}) }}"
+                                        <a href="{{ path('refuseApplication', {'idProject': detailsProject.id, 'idUser': candidatureOfAllUsers[i].idAccount.id}) }}"
                                            class="btn btn-danger add" style="margin-top: 0.5em; min-width: 12em"><i
                                                     class="fas fa-user-times"></i> Refuser</a>
                                     </div>
@@ -247,11 +247,13 @@
             </div>
         </div>
         <div class="d-flex flex-row mw-100 mx-3 justify-content-center">
-            <a href="{{ path('detailProject',  {'id': 1}) }}" class="btn btn-warning w-25 add mx-auto"><i
+            <a href="{{ path('delApplication',  {'idProject': detailsProject.id}) }}" style="width: 20%" class="btn btn-danger add mx-auto"> <i
+                class="fas fa-user-minus"></i> Se retirer du projet</a>
+            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 20%" class="btn btn-warning add mx-auto"><i
                         class="fas fa-edit"></i> Modifier le projet</a>
-            <a href="{{ path('detailProject',  {'id': 1}) }}" class="btn btn-primary w-25 add mx-auto"><i
+            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 20%" class="btn btn-primary add mx-auto"><i
                         class="fas fa-list-ul"></i> Liste des membres</a>
-            <a href="{{ path('detailProject',  {'id': 1}) }}" class="btn btn-primary w-25 add mx-auto"><i
+            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 20%" class="btn btn-primary add mx-auto"><i
                         class="fas fa-comments"></i> Espace Discussion</a>
         </div>
     </div>
