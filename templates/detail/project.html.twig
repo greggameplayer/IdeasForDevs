@@ -26,7 +26,7 @@
     <div class="flex-column page-section">
         <div class="d-flex flex-row flex-wrap-reverse">
             <div class="d-flex flex-column"
-                 style="max-width: 40em; min-width: 20em; margin: 2em">
+                 style="width: 40em; min-width: 20em; margin: 2em">
                 {% if imgProject is not null %}
                     <img src="{{ asset(imgProject) }}" class="w-100 h-100"
                          style="object-fit: cover" alt="Erreur de chargement de l'image">
@@ -50,7 +50,7 @@
                 </div>
             </div>
             <div class="d-flex flex-column border justify-content-center"
-                 style="max-width: 70em; min-width: 10em; margin: 2em">
+                 style="width: 70em; min-width: 10em; margin: 2em">
                 <div class="d-flex flex-row">
                     <h2><u>Projet:</u></h2>
                     <a href="{{ path('projectReport', {'id':detailsProject.id}) }}" class="justify-content-end mt-3" title="Signaler le projet"
