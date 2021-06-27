@@ -1,0 +1,167 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Membres du Projet{% endblock %}
+
+{% block body %}
+    <section class="page-section">
+
+        <div class="d-flex justify-content-center mt-3 mb-3">
+            
+        </div>
+
+        <div class="container">
+
+            <h2>Créateur</h2>
+
+            <div class="card d-flex flex-row">
+                <div class="card-body d-flex flex-row">
+                    <div class="col-sm-3" style="margin-right: 1em">
+                        <img src="{{ asset('images/noIMG.jpg') }}"  style="width:100%">
+                    </div>
+                    <div>
+                        <h5 class="card-title">{{ project.name}}</h5>
+                        <h5>{{ creator.firstname}} {{ creator.lastname}}  </h5>
+                        <p>Email : {{ creator.email }}</p>
+                    </div>
+
+                </div>
+                <div class="card-body " style="max-width: 8em">
+                    <a data-toggle="tooltip" data-placement="top" title="Signaler le projet" href="#"><i class="far fa-flag text-danger"></i></a>
+                </div>
+            </div>
+
+        </div>
+        
+        {% if administrator is defined %}
+
+        <div class="container mt-3">
+            <h2>Administrateurs</h2>
+            {% for admin in administrator %}
+
+
+                <div class="card d-flex flex-row mb-3">
+                <div class="card-body d-flex flex-row">
+                    <div class="col-sm-3" style="margin-right: 1em">
+                        <img src="{{ asset('images/noIMG.jpg') }}"  style="width:100%">
+                    </div>
+                    <div>
+                        <h5 class="card-title">{{ admin.firstname }} {{ admin.lastname }}</h5>
+                        <p>Email : {{ admin.email }} </p>
+                        <p>Détails</p>
+                    </div>
+
+                    {% if isAdmin is defined %}
+                    <div style="margin-top:auto; margin-bottom:auto; margin-left:auto; margin-right:auto">
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Modifier le rôle
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="{{ path( 'evolutionApply', {'idUser': admin.id,'idProject': project.id, 'idStatus' : 3} ) }}">Passer simple membre</a>
+                                <a class="dropdown-item" href="{{ path( 'evolutionApply', {'idUser': admin.id,'idProject': project.id, 'idStatus' : 5} ) }}">Retirer du projet</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+                <div class="card-body " style="max-width: 8em">
+                    <a data-toggle="tooltip" data-placement="top" title="Signaler le projet" href="#"><i class="far fa-flag text-danger"></i></a>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+        {% endif %}
+
+        <div class="container mt-3">
+        <h2>Membres</h2>
+        {% if members is defined and members|length > 0%}
+            {% for member in members %}
+
+
+                <div class="card d-flex flex-row">
+                    <div class="card-body d-flex flex-row">
+                        <div class="col-sm-3" style="margin-right: 1em">
+                            <img src="{{ asset('images/noIMG.jpg') }}"  style="width:100%">
+                        </div>
+                        <div>
+                            <h5 class="card-title">{{ member.firstname }} {{ member.lastname }}</h5>
+                            <p>Email : {{ member.email }} </p>
+                            <p>Détails</p>
+                        </div>
+                        {% if isAdmin is defined %}
+                        <div style="margin-top:auto; margin-bottom:auto; margin-left:auto; margin-right:auto">
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Modifier le rôle
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item" href="{{ path( 'evolutionApply', {'idUser': member.id,'idProject': project.id, 'idStatus' : 4} ) }}">Rendre Administrateur</a>
+                                    <a class="dropdown-item" href="{{ path( 'evolutionApply', {'idUser': member.id,'idProject': project.id, 'idStatus' : 5} ) }}">Retirer du projet</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                    </div>
+                    <div class="card-body " style="max-width: 8em">
+                        <a data-toggle="tooltip" data-placement="top" title="Signaler le projet" href="#"><i class="far fa-flag text-danger"></i></a>
+                    </div>
+                </div>
+            {% endfor %}
+
+        {% else %}
+            <p>Il n'y a pas de simple membre pour le moment.</p>
+        {% endif %}
+        </div>
+
+
+        <div class="container mt-3">
+            <h2>Candidats</h2>
+            {% if waiting is defined and waiting|length > 0%}
+                {% set i = 0 %}
+                {% for wait in waiting %}
+
+                    <div class="card d-flex flex-row">
+                        <div class="card-body d-flex flex-row">
+                            <div class="col-sm-3" style="margin-right: 1em">
+                                <img src="{{ asset('images/noIMG.jpg') }}"  style="width:100%">
+                            </div>
+                            <div>
+                                <h5 class="card-title">{{ wait.firstname }} {{ wait.lastname }}</h5>
+                                <p>Email : {{ wait.email }} </p>
+                                <p>Message : {{ descriptions[i] }}</p>
+                            </div>
+
+                            {% if isAdmin is defined %}
+                            <div style="margin-top:auto; margin-bottom:auto; margin-left:auto; margin-right:auto">
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Attribuer un rôle
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="{{ path( 'evolutionApply', {'idUser': wait.id,'idProject': project.id, 'idStatus' : 3} ) }}">Rendre Membre</a>
+                                        <a class="dropdown-item" href="{{ path( 'evolutionApply', {'idUser': wait.id,'idProject': project.id, 'idStatus' : 4} ) }}">Rendre Administrateur</a>
+                                        <a class="dropdown-item" href="{{ path( 'evolutionApply', {'idUser': wait.id,'idProject': project.id, 'idStatus' : 2} ) }}">Refuser</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                        </div>
+                        <div class="card-body " style="max-width: 8em">
+                            <a data-toggle="tooltip" data-placement="top" title="Signaler le projet" href="#"><i class="far fa-flag text-danger"></i></a>
+                        </div>
+                    </div>
+                    {% set i = i+1 %}
+                {% endfor %}
+
+            {% else %}
+                <p>Il n'y a pas de simple de candidat en attente pour le moment.</p>
+            {% endif %}
+        </div>
+
+    </section>
+
+{% endblock %}  

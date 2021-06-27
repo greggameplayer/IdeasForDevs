@@ -112,4 +112,15 @@ AND account.id != :idUserConnected
         return $stmt->executeQuery(['id' => $id])->fetchOne();
     }
 
+    public function findByProjectUser($idUser, $idProject)
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.idAccount = :val')
+            ->setParameter('val', $idUser)
+            ->andWhere('p.idProject = :val2')
+            ->setParameter("val2", $idProject)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
 }

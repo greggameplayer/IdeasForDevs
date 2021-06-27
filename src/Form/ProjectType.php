@@ -19,6 +19,17 @@ class ProjectType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+
+            ->add('avatar', AvatarType::class, [
+                'mapped' => false,
+                'label'=>'Avatar :',
+                "label_attr" => [
+                    "class" => "h3 ml-4 mb-0"
+                ],
+                "required" => false,
+                "label" => "Image du projet :"
+            ])
+
             ->add('repo', TextType::class, [
                 "label_attr" => [
                     "class" => "h3 ml-4 mb-0"
@@ -38,12 +49,6 @@ class ProjectType extends AbstractType
                     "class" => "form-control"
                 ],
                 'label'=>'Nom du projet :'
-            ])
-
-            ->add("Sauvegarder", SubmitType::class, [
-                "attr" => [
-                    "class" => "btn btn-primary w-100"
-                ]
             ])
 
             ->add('description', TextareaType::class, [

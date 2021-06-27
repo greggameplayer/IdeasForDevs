@@ -3,8 +3,7 @@
 {% block title %}Nouveau projet{% endblock %}
 
 {% block javascripts %}
-    <script type="text/javascript" src="{{ asset('js/bootstrap-multiselect.js') }}" defer></script>
-    <script src="{{ asset('js/createProject.js') }}" defer></script>
+
 {% endblock %}
 
 {% block stylesheets %}
@@ -13,10 +12,15 @@
 {% endblock %}
 
 {% block body %}
+
+    <script type="text/javascript" src="{{ asset('js/bootstrap-multiselect.js') }}" defer></script>
+    <script src="{{ asset('js/createProject.js') }}" defer></script>
+
     <div class="flex-column page-section justify-content-center mx-auto mt-5 w-75">
         <div class="alert alert-danger d-none" role="alert" id="errorAlert"></div>
         {{ form_start(form) }}
         {{ form_row(form.name) }}
+        {{ form_row(form.avatar) }}
         {{ form_row(form.description) }}
         {{ form_row(form.repo) }}
 
@@ -24,7 +28,7 @@
         <div class="input-group">
             <input id="skills" type="text" class="form-control" name="skills">
             <div class="input-group-append">
-                <button id="skillsbtn" class="btn btn-primary" style="border-radius: 0 0.5rem 0.5rem 0;"><i class="fas fa-plus"></i></button>
+                <button type="button" id="skillsbtn" class="btn btn-primary" style="border-radius: 0 0.5rem 0.5rem 0;"><i class="fas fa-plus"></i></button>
             </div>
         </div>
         <div id="skills_display" class="mt-2 card">

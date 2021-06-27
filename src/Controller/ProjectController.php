@@ -2,10 +2,20 @@
 
 namespace App\Controller;
 
+use App\Document\Avatar;
 use App\Entity\Account;
 use App\Entity\Apply;
+use App\Entity\Job;
+use App\Entity\JobsAccount;
+use App\Form\RegistrationFormType;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\MongoDBException;
+use MongoDB\BSON\ObjectId;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Knp\Component\Pager\PaginatorInterface;
@@ -14,6 +24,7 @@ use App\Entity\RoleProject;
 use App\Form\ApplyType;
 use App\Form\ProjectType;
 use DateTime;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class ProjectController extends AbstractController
 {
@@ -122,30 +133,57 @@ class ProjectController extends AbstractController
         ]);
     }
 
+
     /**
-     * @Route("/user/createProject", name="createProject")
-     * @param Request $request
-     * @return Response
+     * @Route("/newProject", name="newProject")
+     * @throws MongoDBException
+     * @throws \Exception
      */
-    public function createProject(Request $request): Response
+    public function newProject(Request $request, DocumentManager $dm)
     {
-        //TODO implement redirection after the creation of the project
         date_default_timezone_set('Europe/Paris');
-        $currentDate = new DateTime();
-
-        $project = new Project;
-        $project->setDateCreation($currentDate);
-        $project->setStatus(0);
-        $project->setAccount($this->getUser());
-
+        $project = new Project();
         $form = $this->createForm(ProjectType::class, $project);
         $form->handleRequest($request);
-        
-        if ($form->isSubmitted() && $form->isValid()) {
+
+        if ($request->isMethod('POST')) {
+
+            // /** @var UploadedFile $document */
+            // $document = $request->files->get("avatar");
+//
+            // if(!in_array($document->guessExtension(), ["png", "jpg", "jpeg", "gif"])) {
+            //     $this->filesystem->remove($document->getPathname());
+            //     return $this->json(["error" => "Le format du fichier pour l'avatar que vous avez envoyé n'est pas supporté !"]);
+            // } else if($document->getSize() > 2000000) {
+            //     $this->filesystem->remove($document->getPathname());
+            //     return $this->json(["error" => "Votre fichier avatar pése plus de 2 Mo !"]);
+            // }
+//
+            // /** @var resource $stream */
+            // $stream = fopen($document->getPathname(), 'r');
+//
+            // /** @var ObjectId $id */
+            // $id = $dm->getDocumentBucket(Avatar::class)->uploadFromStream($document->getClientOriginalName(), $stream);
+            // fclose($stream);
+//
+            // $this->filesystem->remove($document->getPathname());
+
+            $project = new Project();
+
+
+            $project->setRepo($request->get("repo"));
+            $project->setName($request->get("name"));
+            $project->setDescription($request->get("description"));
+            $project->setStatus(0);
+            $project->setDateCreation(new DateTime());
+            $project->setSkills(json_decode($request->get("skills")));
+            $project->setJobNeeded(json_decode($request->get("jobs")));
+            //$project->setIdMongo($id->serialize());
             $project->setAccount($this->getUser());
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($project);
-            $em->flush();
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($project);
+            $entityManager->flush();
 
             $apply = new Apply();
             $roleProject = $this->getDoctrine()->getRepository(RoleProject::class)->findOneBy(['id' => 4]);
@@ -158,13 +196,17 @@ class ProjectController extends AbstractController
             $em->persist($apply);
             $em->flush();
 
-            //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
+            return $this->json(["message" => "good !", "avatarId" => 1]);
         }
+
         return $this->render('project/createProject.html.twig', [
             'form' => $form->createView(),
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0])
         ]);
     }
+
+
+
 
     /**
      * @Route("/user/updateProject/{id}", name="updateProject")
@@ -218,9 +260,9 @@ class ProjectController extends AbstractController
     }
 
     /**
-     * @Route("/user/getMemberProject/{id}", name="getMemberProject")
+     * @Route("/user/getMembersProject/{id}", name="getMembersProject")
      */
-    public function getMemberProject($id)
+    public function getMembersProject($id)
     {        
         $project = $this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $id]);
 
@@ -229,6 +271,7 @@ class ProjectController extends AbstractController
             $members = [];
             $admin=[];
             $waiting=[];
+            $description = [];
             $rejected=[];
     
             foreach ($applies as $apply){
@@ -242,6 +285,7 @@ class ProjectController extends AbstractController
                 }
                 if ($apply->getRoleProject()->getName() == 'En attente'){
                     $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $apply->getIdAccount()->getId()]);
+                    array_push($description, $apply->getDescription());
                     array_push($waiting, $account);
                 }
                 if ($apply->getRoleProject()->getName() == 'Refusé'){
@@ -252,15 +296,47 @@ class ProjectController extends AbstractController
     
             $creator = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]);
     
-            return $this->render('test.html.twig', [
+            return $this->render('project/projectMembers.html.twig', [
                 'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
                 'creator' => $creator,
                 'members'=>$members,
                 'administrator'=>$admin,
                 'waiting'=>$waiting,
-                'rejected'=>$rejected
+                'rejected'=>$rejected,
+                'project' =>$project,
+                'descriptions'=>$description,
+                'isAdmin'=>1
             ]); 
         }
+
+        elseif ($this->isMember($project)){
+            $applies = $project->getApplies();
+            $members = [];
+            $admin=[];
+
+            foreach ($applies as $apply){
+                if ($apply->getRoleProject()->getName() == 'Membre'){
+                    $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $apply->getIdAccount()->getId()]);
+                    array_push($members, $account);
+                }
+                if ($apply->getRoleProject()->getName() == 'Administrateur'){
+                    $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $apply->getIdAccount()->getId()]);
+                    array_push($admin, $account);
+                }
+            }
+
+            $creator = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]);
+
+
+            return $this->render('project/projectMembers.html.twig', [
+                'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
+                'creator' => $creator,
+                'members'=>$members,
+                'administrator'=>$admin,
+                'project' =>$project
+            ]);
+        }
+        return $this->redirectToRoute('allProjects');
     }
 
 
@@ -327,6 +403,32 @@ class ProjectController extends AbstractController
         }
         
     }
+
+    /**
+     * @Route("/user/evolutionApply/{idUser}/{idProject}/{idStatus}", name="evolutionApply")
+     */
+    public function evolutionApply($idUser, $idProject, $idStatus): Response
+    {
+        $project=$this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $idProject]);
+        if($this->isAdmin($project)){
+
+            $apply=$this->getDoctrine()->getRepository(Apply::class)->findByProjectUser($idUser, $idProject);
+            $projectRole = $this->getDoctrine()->getRepository(RoleProject::class)->findOneBy(['id' => $idStatus]);
+            $apply->setRoleProject($projectRole);
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+
+            return  $this->redirectToRoute('getMembersProject',['id' => $project->getId()]);;
+        }
+
+        return  $this->redirectToRoute('allProjects');
+
+
+
+
+    }
+
+
 
     /**
      * @Route("/user/delApply/{idApply}", name="delApply")
