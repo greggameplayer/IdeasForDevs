@@ -1,0 +1,17 @@
+<div class="d-flex justify-content-center mt-3 mb-3">
+    <form action="{{ path( 'userProject' ) }}" method="GET" class="d-flex justify-content-between w-40">
+        <div style="margin-right: 0.4em">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Trier par
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="#">Date</a>
+                    <a class="dropdown-item" href="#">Popularité</a>
+                </div>
+            </div>
+        </div>
+        <input type="text" placeholder="Rechercher un projet" name="search" id="search" class="form-control" style="margin-right: 0.4em">
+        <input type="submit" value="Rechercher" class="btn btn-primary">
+    </form>
+</div>

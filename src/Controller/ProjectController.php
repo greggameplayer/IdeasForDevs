@@ -84,6 +84,81 @@ class ProjectController extends AbstractController
         }
 
 
+
+        $projects = $paginator->paginate(
+            $data,
+            $request->query->getInt('page', 1),
+            2
+        );
+
+
+        $projectsNotation =[];
+        $imgProject= [];
+
+        foreach($projects as $project){
+            //To get creator of the project
+            $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]);
+            $project->setAccount($account);
+            array_push($imgProject, ProfileController::getProjectImage($project, $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir')));
+            //To get like and dislike
+            $test = True;
+            $isFors = $project->getIsFors();
+            foreach ($isFors as $like){
+                $noted = 0;
+                $likes = 0;
+                $dislikes = 0;
+                if($like->getEvaluation()){
+                    $likes++;
+                }
+                else{
+                    $dislikes++;
+                }
+                if($like->getIdAccount()->getId() == $this->getUser()->getId() && $like->getEvaluation()){
+                    $noted = 1;
+                }
+                if($like->getIdAccount()->getId() == $this->getUser()->getId() && !$like->getEvaluation()){
+                    $noted = 2;
+                }
+                array_push($projectsNotation, [$noted, $likes, $dislikes]);
+                $test = False;
+            }
+            if($test){
+                array_push($projectsNotation, [0, 0, 0]);
+            }
+        }
+
+        return $this->render('project/index.html.twig', [
+            'projects' => $projects,
+            'notations' => $projectsNotation,
+            'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
+            'imgProject' => $imgProject
+        ]);
+    }
+
+    /**
+     * @Route("/user/userProject", name="userProject")
+     * @param Request $request
+     * @return Response
+     */
+    public function userProject(Request $request, PaginatorInterface $paginator, DocumentManager $dm): Response
+    {
+        $applies = $this->getDoctrine()->getRepository(Apply::class)->findUserApplies($this->getUser()->getId());
+        $data = [];
+        foreach ($applies as $apply){
+            if(isset($_GET['search'])){
+                $projectId = $this->getDoctrine()->getRepository(Project::class)->findOneByNameAndId($_GET['search'], $apply->getIdProject()->getId());
+
+                if(isset($projectId)){
+                    $project = dd($this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $projectId ]));
+                    array_push($data, $project);
+                }
+            }
+            else{
+                $project = $this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $apply->getIdProject()->getId()]);
+                array_push($data, $project);
+            }
+        }
+
         $projects = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),

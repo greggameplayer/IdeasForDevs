@@ -58,6 +58,20 @@ class ProjectRepository extends ServiceEntityRepository
         ;
     }
 
+
+    public function findOneByNameAndId($search, $idProject){
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT project.id
+        FROM project
+        WHERE project.id = :idProject AND project.name LIKE :search";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['idProject' => $idProject, 'search' => "%$search%"])->fetchOne();
+    }
+
     public function detailsProject($id) :array
     {
         $conn = $this->getEntityManager()->getConnection();

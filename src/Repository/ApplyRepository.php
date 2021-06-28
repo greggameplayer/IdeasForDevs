@@ -123,4 +123,17 @@ AND account.id != :idUserConnected
             ->getOneOrNullResult()
             ;
     }
+
+    public function findUserApplies($id)
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.id = :val')
+            ->setParameter('val', $id)
+            ->andWhere('p.roleProject = 1' )
+            ->orWhere( 'p.roleProject = 3')
+            ->orWhere('p.roleProject = 4')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }
