@@ -40,9 +40,6 @@ class ProjectController extends AbstractController
     public function isAdmin($project)
     {
         $applies = $project->getApplies();
-        if($project->getAccount()->getId() == $this->getUser()->getId()){
-            return True;
-        }
         foreach ($applies as $apply){
             if ($apply->getRoleProject()->getName() == 'Administrateur'){
                 $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $apply->getIdAccount()->getId()]);
@@ -262,78 +259,92 @@ class ProjectController extends AbstractController
     /**
      * @Route("/user/getMembersProject/{id}", name="getMembersProject")
      */
-    public function getMembersProject($id)
+    public function getMembersProject($id, DocumentManager $dm)
     {
         $project = $this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $id]);
 
         if($this->isAdmin($project)){
             $applies = $project->getApplies();
             $members = [];
+            $avatarMembers = [];
             $admin=[];
+            $avatarAdmins = [];
             $waiting=[];
+            $avatarWaiting = [];
             $description = [];
-            $rejected=[];
 
             foreach ($applies as $apply){
                 if ($apply->getRoleProject()->getName() == 'Membre'){
                     $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $apply->getIdAccount()->getId()]);
                     array_push($members, $account);
+                    array_push($avatarMembers, ProfileController::getUserAvatar($account, $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir')));
                 }
                 if ($apply->getRoleProject()->getName() == 'Administrateur'){
                     $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $apply->getIdAccount()->getId()]);
                     array_push($admin, $account);
+                    array_push($avatarAdmins, ProfileController::getUserAvatar($account, $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir')));
                 }
                 if ($apply->getRoleProject()->getName() == 'En attente'){
                     $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $apply->getIdAccount()->getId()]);
                     array_push($description, $apply->getDescription());
                     array_push($waiting, $account);
-                }
-                if ($apply->getRoleProject()->getName() == 'Refusé'){
-                    $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $apply->getIdAccount()->getId()]);
-                    array_push($rejected, $account);
+                    array_push($avatarWaiting, ProfileController::getUserAvatar($account, $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir')));
                 }
             }
 
             $creator = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]);
+            $avatarCreator = ProfileController::getUserAvatar($creator, $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir'));
 
             return $this->render('project/projectMembers.html.twig', [
                 'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
                 'creator' => $creator,
+                'avatarCreator' => $avatarCreator,
                 'members'=>$members,
+                'avatarMembers' => $avatarMembers,
                 'administrator'=>$admin,
+                'avatarAdmins' => $avatarAdmins,
                 'waiting'=>$waiting,
-                'rejected'=>$rejected,
+                'avatarWaiting' => $avatarWaiting,
                 'project' =>$project,
                 'descriptions'=>$description,
-                'isAdmin'=> 1
+                'isAdmin'=> true
             ]);
         }
 
         elseif ($this->isMember($project)){
             $applies = $project->getApplies();
             $members = [];
+            $avatarMembers = [];
             $admin=[];
+            $avatarAdmins = [];
 
             foreach ($applies as $apply){
                 if ($apply->getRoleProject()->getName() == 'Membre'){
                     $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $apply->getIdAccount()->getId()]);
                     array_push($members, $account);
+                    array_push($avatarMembers, ProfileController::getUserAvatar($account, $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir')));
                 }
                 if ($apply->getRoleProject()->getName() == 'Administrateur'){
                     $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $apply->getIdAccount()->getId()]);
                     array_push($admin, $account);
+                    array_push($avatarAdmins, ProfileController::getUserAvatar($account, $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir')));
+
                 }
             }
 
             $creator = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]);
-
+            $avatarCreator = ProfileController::getUserAvatar($creator, $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir'));
 
             return $this->render('project/projectMembers.html.twig', [
                 'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
                 'creator' => $creator,
+                'avatarCreator' => $avatarCreator,
                 'members'=>$members,
+                'avatarMembers' => $avatarMembers,
                 'administrator'=>$admin,
-                'project' =>$project
+                'avatarAdmins' => $avatarAdmins,
+                'project' =>$project,
+                'isAdmin' => false
             ]);
         }
         return $this->redirectToRoute('allProjects');
@@ -347,33 +358,63 @@ class ProjectController extends AbstractController
      */
     public function applyToProject(Request $request, $idProject): Response
     {
-        //TODO implement redirection after the creation of the project
-        $apply = new Apply;
 
-        $roleProject = $this->getDoctrine()->getRepository(RoleProject::class)->findOneBy(['id' => 1]);
-        $project=$this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $idProject]);
-        $project->setAccount($this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]));
+        if($this->getDoctrine()->getRepository(Apply::class)->findOneBy(['idProject' => $idProject, 'idAccount' => $this->getUser()->getId()]) != null){
+            $apply = $this->getDoctrine()->getRepository(Apply::class)->findOneBy(['idProject' => $idProject, 'idAccount' => $this->getUser()->getId()]);
+            $roleProject = $this->getDoctrine()->getRepository(RoleProject::class)->findOneBy(['id' => 1]);
 
-        $apply->setIdProject($project);
-        $apply->setIdAccount($this->getUser());
-        $apply->setRoleProject($roleProject);
+            $project=$this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $idProject]);
+            $project->setAccount($this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]));
 
-        $form = $this->createForm(ApplyType::class, $apply);
-        $form->handleRequest($request);
+            $apply->setRoleProject($roleProject);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($apply);
-            $em->flush();
+            $form = $this->createForm(ApplyType::class, $apply);
+            $form->handleRequest($request);
 
-            //return $this->redirectToRoute('detailProject'); Ajouter la redirection vers le projet
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($apply);
+                $em->flush();
+
+                return $this->redirectToRoute('detailProject', ['id' => $idProject]);
+            }
+
+            return $this->render('project/applyProject.html.twig', [
+                'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
+                'project' => $project,
+                'form' => $form->createView()
+            ]);
+
+        }
+        else{
+            $apply = new Apply;
+
+            $roleProject = $this->getDoctrine()->getRepository(RoleProject::class)->findOneBy(['id' => 1]);
+            $project=$this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $idProject]);
+            $project->setAccount($this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]));
+
+            $apply->setIdProject($project);
+            $apply->setIdAccount($this->getUser());
+            $apply->setRoleProject($roleProject);
+
+            $form = $this->createForm(ApplyType::class, $apply);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($apply);
+                $em->flush();
+
+                return $this->redirectToRoute('detailProject', ['id' => $idProject]);
+            }
+
+            return $this->render('project/applyProject.html.twig', [
+                'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
+                'project' => $project,
+                'form' => $form->createView()
+            ]);
         }
 
-        return $this->render('project/applyProject.html.twig', [
-            'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
-            'project' => $project,
-            'form' => $form->createView()
-        ]);
     }
 
     /**

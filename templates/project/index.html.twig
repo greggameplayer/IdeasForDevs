@@ -46,7 +46,7 @@
 
                         <div class="card-body d-flex flex-row flex-wrap">
                             <div class="square--landscape justify-content-center" style="margin-right: 1em; min-width: 10em">
-                                {% if imgProject|length == 0 %}
+                                {% if imgProject[i] is null %}
                                     <img src="{{ asset('images/noIMG.jpg') }}"  style="object-fit: cover; width: 100%">
                                 {% else %}
                                     <img src="{{ asset(imgProject[i]) }}"  style="object-fit: cover; width: 100%">

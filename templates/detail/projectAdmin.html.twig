@@ -172,48 +172,46 @@
                      style="max-height: 40em; overflow-y: auto;">
                     {% if commentaries|length != 0 %}
                         {% for i in 0..commentaries|length-1 %}
-                            {% if commentaries[i].id != app.user.id %}
-                                <div class="d-flex flex-column border" style="margin: 1em">
-                                    <div class="d-flex flex-row">
-                                        <div class="m-3 justify-content-center d-flex">
-                                            <div class="circular--landscape">
-                                                {% if avatarUserForEachCommentaries[i] is not null %}
-                                                    <img src="{{ asset(avatarUserForEachCommentaries[i]) }}"
-                                                         class="w-100 h-100"
-                                                         style="object-fit: cover"
-                                                         alt="Erreur de chargement de l'image">
-                                                {% else %}>
-                                                    <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
-                                                         style="object-fit: cover"
-                                                         alt="Erreur de chargement de l'image">
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="d-flex flex-column w-100">
-                                            <div class="d-flex flex-row mw-100">
-                                                <h4 class=" text-primary">
-                                                    <u>{{ commentaries[i].firstname }} {{ commentaries[i].lastname }}</u>
-                                                </h4>
-                                                <a href="{{ path('userReport', {'id':commentaries[i].idUser}) }}"
-                                                   class="justify-content-end mt-3" title="Signaler l'utilisateur"
-                                                   style="margin-left: auto; margin-right: 1.6em"><i
-                                                            class="far fa-flag text-danger fa-2x"></i></a>
-                                            </div>
-                                            <p><u>{{ commentaries[i].date_comment|date('d-m-Y') }}
-                                                    à {{ commentaries[i].date_comment|date('H') }}
-                                                    h{{ commentaries[i].date_comment|date('i') }}</u></p>
-
+                            <div class="d-flex flex-column border" style="margin: 1em">
+                                <div class="d-flex flex-row">
+                                    <div class="m-3 justify-content-center d-flex">
+                                        <div class="circular--landscape">
+                                            {% if avatarUserForEachCommentaries[i] is not null %}
+                                                <img src="{{ asset(avatarUserForEachCommentaries[i]) }}"
+                                                     class="w-100 h-100"
+                                                     style="object-fit: cover"
+                                                     alt="Erreur de chargement de l'image">
+                                            {% else %}>
+                                                <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
+                                                     style="object-fit: cover"
+                                                     alt="Erreur de chargement de l'image">
+                                            {% endif %}
                                         </div>
                                     </div>
-                                    <div class="d-flex flex-row border mb-3 m-3">
-                                        <p class="m-3">{{ commentaries[i].comment }}</p>
-                                        <a href="{{ path('commentReport', {'id':commentaries[i].id}) }}"
-                                           class="justify-content-end mt-3" title="Signaler le commentaire"
-                                           style="margin-left: auto; margin-right: 1.6em"><i
-                                                    class="far fa-flag text-danger fa-2x"></i></a>
+                                    <div class="d-flex flex-column w-100">
+                                        <div class="d-flex flex-row mw-100">
+                                            <h4 class=" text-primary">
+                                                <u>{{ commentaries[i].firstname }} {{ commentaries[i].lastname }}</u>
+                                            </h4>
+                                            <a href="{{ path('userReport', {'id':commentaries[i].idUser}) }}"
+                                               class="justify-content-end mt-3" title="Signaler l'utilisateur"
+                                               style="margin-left: auto; margin-right: 1.6em"><i
+                                                        class="far fa-flag text-danger fa-2x"></i></a>
+                                        </div>
+                                        <p><u>{{ commentaries[i].date_comment|date('d-m-Y') }}
+                                                à {{ commentaries[i].date_comment|date('H') }}
+                                                h{{ commentaries[i].date_comment|date('i') }}</u></p>
+
                                     </div>
                                 </div>
-                            {% endif %}
+                                <div class="d-flex flex-row border mb-3 m-3">
+                                    <p class="m-3">{{ commentaries[i].comment }}</p>
+                                    <a href="{{ path('commentReport', {'id':commentaries[i].id}) }}"
+                                       class="justify-content-end mt-3" title="Signaler le commentaire"
+                                       style="margin-left: auto; margin-right: 1.6em"><i
+                                                class="far fa-flag text-danger fa-2x"></i></a>
+                                </div>
+                            </div>
                         {% endfor %}
                     {% else %}
                         <div class="mw-100" style="margin: 2em;">
@@ -221,37 +219,17 @@
                         </div>
                     {% endif %}
                 </div>
-                {% set commented = 0 %}
-                {% for commentary in commentaries %}
-                    {% if commentary.id == app.user.id %}
-                        <div class="mw-100 mx-3 my-2">
-                            <form action="{{ path('UpdateCommente',  {'id': detailsProject.id}) }}" method="POST"
-                                  class="d-flex flex-column">
-                                <label for="commentaire" class="h5"><u>Votre commentaire:</u></label>
-                                <textarea id="commentaire" name="commentaire" class="form-control" maxlength="499"
-                                          placeholder="Entrez ici votre commentaire">{{ commentary.comment }}</textarea>
-                                <button type="submit" class="btn btn-outline-primary mw-100 add mx-5 my-2"><i
-                                            class="fas fa-comment-alt"></i> Valider la
-                                    modification
-                                </button>
-                            </form>
-                        </div>
-                        {% set commented = 1 %}
-                    {% endif %}
-                {% endfor %}
-                {% if commented == 0 %}
-                    <div class="mw-100 mx-3 my-2">
-                        <form action="{{ path('commente', {'id': detailsProject.id}) }}" method="POST"
-                              class="d-flex flex-column">
-                            <label for="commentaire" class="h5"><u>Votre commentaire:</u></label>
-                            <textarea id="commentaire" name="commentaire" class="form-control" maxlength="499"
-                                      placeholder="Entrez ici votre commentaire"></textarea>
-                            <button type="submit" class="btn btn-outline-primary mw-100 add mx-5 my-2"><i
-                                        class="fas fa-comment-alt"></i> Commenter
-                            </button>
-                        </form>
-                    </div>
-                {% endif %}
+                <div class="mw-100 mx-3 my-2">
+                    <form action="{{ path('commente', {'id': detailsProject.id}) }}" method="POST"
+                          class="d-flex flex-column">
+                        <label for="commentaire" class="h5"><u>Votre commentaire:</u></label>
+                        <textarea id="commentaire" name="commentaire" class="form-control" maxlength="499"
+                                  placeholder="Entrez ici votre commentaire"></textarea>
+                        <button type="submit" class="btn btn-outline-primary mw-100 add mx-5 my-2"><i
+                                    class="fas fa-comment-alt"></i> Commenter
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
         <div class="d-flex flex-row mw-100 mx-3 justify-content-center flex-wrap">
@@ -286,7 +264,7 @@
             <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 15em; height: 2.5em"
                class="btn btn-warning add mx-auto my-2"><i
                         class="fas fa-edit"></i> Modifier le projet</a>
-            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 15em; height: 2.5em"
+            <a href="{{ path('getMembersProject',  {'id': detailsProject.id}) }}" style="width: 15em; height: 2.5em"
                class="btn btn-primary add mx-auto my-2"><i
                         class="fas fa-list-ul"></i> Liste des membres</a>
             <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 15em; height: 2.5em"
