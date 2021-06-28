@@ -85,13 +85,6 @@ class ProjectController extends AbstractController
             $data = $this->getDoctrine()->getRepository(Project::class)->findAll();
         }
 
-        //foreach($data as $try){
-        //    foreach($try->getIsFors() as $notation){
-        //        if($notation->getEvaluation()){
-        //            
-        //        }
-        //    }
-        //}
 
         $projects = $paginator->paginate(
             $data,
@@ -177,7 +170,7 @@ class ProjectController extends AbstractController
             $project->setRepo($request->get("repo"));
             $project->setName($request->get("name"));
             $project->setDescription($request->get("description"));
-            $project->setStatus(0);
+            $project->setStatus(1);
             $project->setDateCreation(new DateTime());
             $project->setSkillsNeeded(json_decode($request->get("skills")));
             $project->setJobNeeded(json_decode($request->get("jobs")));
@@ -440,7 +433,7 @@ class ProjectController extends AbstractController
                 
         $apply = $this->getDoctrine()->getRepository(Apply::class)->findOneBy(['id' => $idApply]);
         
-        if($apply->setIdAccount()->getId() == $this->getUser()->getId()){
+        if($apply->getIdAccount()->getId() == $this->getUser()->getId()){
             $em = $this->getDoctrine()->getManager();
             $em->remove($apply);
             $em->flush();

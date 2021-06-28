@@ -170,6 +170,7 @@
                 <h2 class="mx-3"><u>Commentaire(s):</u></h2>
                 <div class="d-flex flex-column  border"
                      style="max-height: 40em; overflow-y: auto;">
+                    {% if commentaries|length > 0 %}
                     {% for i in 0..commentaries|length-1 %}
                         {% if commentaries[i].id != app.user.id %}
                             <div class="d-flex flex-column border" style="margin: 1em">
@@ -212,6 +213,7 @@
                             </div>
                         {% endif %}
                     {% endfor %}
+                    {% endif %}
                 </div>
                 {% set commented = 0 %}
                 {% for commentary in commentaries %}
