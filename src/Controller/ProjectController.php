@@ -78,10 +78,10 @@ class ProjectController extends AbstractController
     public function allProjects(Request $request, PaginatorInterface $paginator, DocumentManager $dm): Response
     {
         if(isset($_GET['search'])){
-            $data = $this->getDoctrine()->getRepository(Project::class)->findByName($_GET['search']);
+            $data = $this->getDoctrine()->getRepository(Project::class)->findAllProjectsOrderByLike($_GET['search']);
         }
         else{
-            $data = $this->getDoctrine()->getRepository(Project::class)->findAll();
+            $data = $this->getDoctrine()->getRepository(Project::class)->findAllProjectsOrderByLike();
         }
 
 
@@ -98,7 +98,8 @@ class ProjectController extends AbstractController
 
         foreach($projects as $project){
             //To get creator of the project
-            $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]);
+            $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project['accountId']]);
+            $project = $this->getDoctrine()->getRepository(Project::class)->find($project['id']);
             $project->setAccount($account);
             array_push($imgProject, ProfileController::getProjectImage($project, $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir')));
             //To get like and dislike
