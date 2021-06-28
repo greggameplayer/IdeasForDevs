@@ -8,6 +8,7 @@ use App\Entity\Account;
 use App\Entity\Apply;
 use App\Entity\Job;
 use App\Entity\JobsAccount;
+use App\Entity\Status;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use MongoDB\BSON\ObjectId;
@@ -125,7 +126,7 @@ class ProjectController extends AbstractController
                 array_push($projectsNotation, [0, 0, 0]);
             }
         }
-        
+
         return $this->render('project/index.html.twig', [
             'projects' => $projects,
             'notations' => $projectsNotation,
@@ -170,12 +171,12 @@ class ProjectController extends AbstractController
             $project->setRepo($request->get("repo"));
             $project->setName($request->get("name"));
             $project->setDescription($request->get("description"));
-            $project->setStatus(1);
             $project->setDateCreation(new DateTime());
             $project->setSkillsNeeded(json_decode($request->get("skills")));
             $project->setJobNeeded(json_decode($request->get("jobs")));
             $project->setIdMongo($id->serialize());
             $project->setAccount($this->getUser());
+            $project->setStatus($this->getDoctrine()->getRepository(Status::class)->find(1));
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($project);
@@ -216,12 +217,12 @@ class ProjectController extends AbstractController
         if($this->isAdmin){
             $form = $this->createForm(ProjectType::class, $project);
             $form->handleRequest($request);
-            
+
             if ($form->isSubmitted() && $form->isValid()) {
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($project);
                 $em->flush();
-    
+
                 //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
             }
             return $this->render('test.html.twig', [
@@ -233,7 +234,7 @@ class ProjectController extends AbstractController
             'info' => "Vous n'avez pas les droits pour modifier ce projet",
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0])
         ]);
-        
+
     }
 
     /**
@@ -241,9 +242,9 @@ class ProjectController extends AbstractController
      */
     public function delProject($id)
     {
-        
+
         $project = $this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $id]);
-        
+
         if($this->isAdmin($project)){
             $em = $this->getDoctrine()->getManager();
             $em->remove($project);
@@ -259,7 +260,7 @@ class ProjectController extends AbstractController
      * @Route("/user/getMembersProject/{id}", name="getMembersProject")
      */
     public function getMembersProject($id)
-    {        
+    {
         $project = $this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $id]);
 
         if($this->isAdmin($project)){
@@ -269,7 +270,7 @@ class ProjectController extends AbstractController
             $waiting=[];
             $description = [];
             $rejected=[];
-    
+
             foreach ($applies as $apply){
                 if ($apply->getRoleProject()->getName() == 'Membre'){
                     $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $apply->getIdAccount()->getId()]);
@@ -289,9 +290,9 @@ class ProjectController extends AbstractController
                     array_push($rejected, $account);
                 }
             }
-    
+
             $creator = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]);
-    
+
             return $this->render('project/projectMembers.html.twig', [
                 'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
                 'creator' => $creator,
@@ -302,7 +303,7 @@ class ProjectController extends AbstractController
                 'project' =>$project,
                 'descriptions'=>$description,
                 'isAdmin'=> 1
-            ]); 
+            ]);
         }
 
         elseif ($this->isMember($project)){
@@ -342,13 +343,13 @@ class ProjectController extends AbstractController
      * @return Response
      */
     public function applyToProject(Request $request, $idProject): Response
-    { 
+    {
         //TODO implement redirection after the creation of the project
         $apply = new Apply;
 
         $roleProject = $this->getDoctrine()->getRepository(RoleProject::class)->findOneBy(['id' => 1]);
         $project=$this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $idProject]);
-        $project->setAccount($this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]));        
+        $project->setAccount($this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]));
 
         $apply->setIdProject($project);
         $apply->setIdAccount($this->getUser());
@@ -378,20 +379,20 @@ class ProjectController extends AbstractController
      * @return Response
      */
     public function updateRoleProject(Request $request, $idProject, $idApply): Response
-    {  
-        
+    {
+
         $project=$this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $idProject]);
 
         if($this->isAdmin($project)){
             $apply =$this->getDoctrine()->getRepository(Apply::class)->findOneBy(['id' => $idApply]);
             $form = $this->createForm(ProjectType::class, $apply);
             $form->handleRequest($request);
-            
+
             if ($form->isSubmitted() && $form->isValid()) {
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($project);
                 $em->flush();
-    
+
                 //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
             }
         }
@@ -429,10 +430,10 @@ class ProjectController extends AbstractController
      * @Route("/user/delApply/{idApply}", name="delApply")
      */
     public function delApply($idApply)
-    {  
-                
+    {
+
         $apply = $this->getDoctrine()->getRepository(Apply::class)->findOneBy(['id' => $idApply]);
-        
+
         if($apply->getIdAccount()->getId() == $this->getUser()->getId()){
             $em = $this->getDoctrine()->getManager();
             $em->remove($apply);
@@ -441,6 +442,6 @@ class ProjectController extends AbstractController
 
         return $this->render('test.html.twig', [
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0])
-        ]);        
-    }    
+        ]);
+    }
 }
