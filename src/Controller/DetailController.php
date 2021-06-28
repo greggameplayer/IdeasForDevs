@@ -7,6 +7,7 @@ use App\Entity\Apply;
 use App\Entity\Commentary;
 use App\Entity\Project;
 use App\Entity\RoleProject;
+use App\Entity\Status;
 use ArrayObject;
 use DateTime;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -257,6 +258,21 @@ class DetailController extends AbstractController
         $em->remove($apply);
         $em->flush();
 
+        return $this->redirectToRoute('detailProject', ["id" => $idProject]);
+    }
+
+    /**
+     * @Route("/modifyStatus/{idProject}/{status}", name="modifyStatus")
+     */
+    public function modifyStatus($idProject, $status): Response
+    {
+        if( $this->getDoctrine()->getRepository(Apply::class)->findOneBy(['idProject' => $idProject, 'idAccount' =>$this->getUser()->getId()])->getRoleProject()->getName() == "Administrateur") {
+            $project = $this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $idProject]);
+            $project->setStatus($this->getDoctrine()->getRepository(Status::class)->findOneBy(['status' => $status])->getId());
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($project);
+            $em->flush();
+        }
         return $this->redirectToRoute('detailProject', ["id" => $idProject]);
     }
 }
