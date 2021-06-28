@@ -77,7 +77,7 @@ class ProjectController extends AbstractController
      * @param Request $request
      * @return Response
      */
-    public function allProjects(Request $request, PaginatorInterface $paginator): Response
+    public function allProjects(Request $request, PaginatorInterface $paginator, DocumentManager $dm): Response
     {
         if(isset($_GET['search'])){
             $data = $this->getDoctrine()->getRepository(Project::class)->findByName($_GET['search']);
@@ -95,11 +95,13 @@ class ProjectController extends AbstractController
 
 
         $projectsNotation =[];
+        $imgProject= [];
 
         foreach($projects as $project){
             //To get creator of the project
             $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]);
             $project->setAccount($account);
+            array_push($imgProject, ProfileController::getProjectImage($project, $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir')));
             //To get like and dislike
             $test = True;
             $isFors = $project->getIsFors();
@@ -130,7 +132,8 @@ class ProjectController extends AbstractController
         return $this->render('project/index.html.twig', [
             'projects' => $projects,
             'notations' => $projectsNotation,
-            'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0])
+            'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
+            'imgProject' => $imgProject
         ]);
     }
 

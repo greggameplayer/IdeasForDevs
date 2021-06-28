@@ -36,7 +36,7 @@ window.addEventListener("load", (event) => {
         })
         .then(function(json) {
             json.forEach((el) => {
-                document.querySelector("#jobsSelect").innerHTML += (`<option value=${el.id} name=${el.name}>${el.name}</option>`)
+                document.querySelector("#jobsSelect").innerHTML += (`<option value=${el.name} name=${el.name}>${el.name}</option>`)
             });
             $("#jobsSelect").multiselect({
                 onChange: function(element, checked) {
