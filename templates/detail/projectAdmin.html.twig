@@ -248,20 +248,30 @@
         </div>
         <div class="d-flex flex-row mw-100 mx-3 justify-content-center flex-wrap">
             {% if adminAlone %}
-                <div class="d-flex flex-column justify-content-center mx-auto my-2" style="width: 20em">
+                <div class="d-flex flex-column justify-content-center mx-auto my-2" style="width: 15em">
                 <button class="btn btn-danger add w-100" style="height: 2.5em" disabled> <i
                             class="fas fa-user-minus"></i> Se retirer du projet</button>
                 <p class="h6 text-danger text-center">Vous ne pouvez pas quitter ce projet car vous etes le seul administrateur</p>
                 </div>
             {% else %}
-                <a href="{{ path('delApplication',  {'idProject': detailsProject.id}) }}" style="width: 20em; height: 2.5em" class="btn btn-danger add mx-auto my-2"> <i
+                <a href="{{ path('delApplication',  {'idProject': detailsProject.id}) }}" style="width: 15em; height: 2.5em" class="btn btn-danger add mx-auto my-2"> <i
                             class="fas fa-user-minus"></i> Se retirer du projet</a>
             {% endif %}
-            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 20em; height: 2.5em" class="btn btn-warning add mx-auto my-2"><i
+            <div class="dropdown mx-auto my-2" style="width: 15em; height: 2.5em" >
+                <button class="btn btn-primary add dropdown-toggle w-100" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Modifier l'état du projet
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="{{ path('modifyStatus', {'idProject':detailsProject.id, 'status':'Recrutement'}) }}">Recrutement {% if detailsProject.status == "Recrutement" %}(Actuelle){% endif %}</a>
+                    <a class="dropdown-item" href="{{ path('modifyStatus', {'idProject':detailsProject.id, 'status':'En cours'}) }}">En cours {% if detailsProject.status == "En cours" %}(Actuelle){% endif %}</a>
+                    <a class="dropdown-item" href="{{ path('modifyStatus', {'idProject':detailsProject.id, 'status':'Abouti'}) }}">Abouti {% if detailsProject.status == "Abouti" %}(Actuelle){% endif %}</a>
+                </div>
+            </div>
+            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 15em; height: 2.5em" class="btn btn-warning add mx-auto my-2"><i
                         class="fas fa-edit"></i> Modifier le projet</a>
-            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 20em; height: 2.5em" class="btn btn-primary add mx-auto my-2"><i
+            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 15em; height: 2.5em" class="btn btn-primary add mx-auto my-2"><i
                         class="fas fa-list-ul"></i> Liste des membres</a>
-            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 20em; height: 2.5em" class="btn btn-primary add mx-auto my-2"><i
+            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 15em; height: 2.5em" class="btn btn-primary add mx-auto my-2"><i
                         class="fas fa-comments"></i> Espace Discussion</a>
         </div>
     </div>
