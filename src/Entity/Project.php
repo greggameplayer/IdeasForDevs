@@ -50,7 +50,7 @@ class Project
     private $tempImage;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne (targetEntity=Status::class)
      */
     private $status;
 
@@ -270,7 +270,7 @@ class Project
         return $this;
     }
 
-   
+
 
 
     /**
