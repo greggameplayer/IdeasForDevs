@@ -11,7 +11,7 @@ use App\Entity\Status;
 use ArrayObject;
 use DateTime;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use http\Env\Request;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
@@ -177,12 +177,13 @@ class DetailController extends AbstractController
     /**
      * @Route("/commente/{id}", name="commente")
      */
-    public function commente($id, Request $request): Response
+    public function commente($id): Response
     {
         $commente = new commentary();
         $commente->setComment($_POST['commentaire']);
         $commente->setIdAccount($this->getUser());
         $commente->setIdProject($this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $id]));
+        date_default_timezone_set('Europe/Paris');
         $commente->setDateComment(new DateTime());
         $em = $this->getDoctrine()->getManager();
         $em->persist($commente);
@@ -198,7 +199,7 @@ class DetailController extends AbstractController
     {
         $commente = $this->getDoctrine()->getRepository(Commentary::class)->findOneBy(['idProject' => $id, 'idAccount' => $this->getUser()]);
         $commente->setComment($_POST['commentaire']);
-        $commente->setDateComment(new DateTime());
+        $commente->setDateComment(new DateTime("Y-m-d h:i:sa",'Europe/Paris'));
         $em = $this->getDoctrine()->getManager();
         $em->persist($commente);
         $em->flush();
@@ -254,8 +255,9 @@ class DetailController extends AbstractController
     public function delApplication($idProject): Response
     {
         $apply = $this->getDoctrine()->getRepository(Apply::class)->findOneBy(['idProject' => $idProject, 'idAccount' => $this->getUser()]);
+        $apply->setRoleProject($this->getDoctrine()->getRepository(RoleProject::class)->findOneBy(['name' => "Retiré"]));
         $em = $this->getDoctrine()->getManager();
-        $em->remove($apply);
+        $em->persist($apply);
         $em->flush();
 
         return $this->redirectToRoute('detailProject', ["id" => $idProject]);

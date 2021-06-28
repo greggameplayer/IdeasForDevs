@@ -103,7 +103,7 @@ AND account.id != :idUserConnected
 
         $sql = "
         SELECT COUNT(apply.id_project_id)
-        FROM apply INNER JOIN Project ON apply.id_project_id = project.id INNER JOIN status ON project.status = status.id
+        FROM apply INNER JOIN Project ON apply.id_project_id = project.id INNER JOIN status ON project.status_id = status.id
         WHERE apply.id_account_id = :id
         AND status.status = 'Abouti'";
 

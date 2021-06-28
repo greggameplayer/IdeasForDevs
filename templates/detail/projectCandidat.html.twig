@@ -25,7 +25,7 @@
 
 
     <div class="flex-column page-section">
-        <div class="d-flex flex-row flex-wrap-reverse">
+        <div class="d-flex flex-row flex-wrap">
             <div class="d-flex flex-column"
                  style="width: 40em; min-width: 20em; margin: 2em">
                 {% if detailsProject.id_mongo is not null %}
@@ -62,7 +62,8 @@
             <div class="d-flex flex-column border justify-content-center"
                  style="width: 70em; min-width: 10em; margin: 2em">
                 <div class="d-flex flex-row">
-                    <div class="border my-3 d-flex flex-column" style="width: 50%; margin-left: 1em; margin-right: 0.5em">
+                    <div class="border my-3 d-flex flex-column"
+                         style="width: 50%; margin-left: 1em; margin-right: 0.5em">
                         <div class="d-flex flex-row">
                             <h2><u>Projet:</u></h2>
                             <a href="{{ path('projectReport', {'id':detailsProject.id}) }}"
@@ -95,26 +96,32 @@
                             </div>
                         </div>
                     </div>
-                    <div class="border my-3 d-flex flex-column" style="width: 50%; margin-right: 1em; margin-left: 0.5em">
-                            <h2><u>Votre candidature:</u></h2>
-                            <div class="h4 mt-3">Role/État:</div>
-                            <p class="text-center h1 {% if candidatureUserConnected.roleProject.name == 'Refusé' %} text-danger {% endif %}{% if candidatureUserConnected.roleProject.name == 'En attente' %} text-warning  {% endif %}{% if candidatureUserConnected.roleProject.name == 'Membre' %} text-primary {% endif %}">{{ candidatureUserConnected.roleProject.name }}</p>
-                            <form action="{{ path('modifyApplication', {'idProject': detailsProject.id}) }}" method="POST"
-                                  class="d-flex flex-column">
-                                <label for="description" class="h5 mt-3"><u>Votre description:</u></label>
-                                <textarea id="description" name="description" class="form-control mx-auto" maxlength="499"
-                                          placeholder="Entrez ici votre description" style="width: 95%; height: 7em; max-height: 7em">{{ candidatureUserConnected.description }}</textarea>
-                                <button type="submit" class="btn btn-outline-primary add mx-5 my-2"><i class="fas fa-check"></i> Valider</button>
-                            </form>
-                            <a href="{{ path('delApplication',  {'idProject': detailsProject.id}) }}" class="btn btn-danger w-50 add mx-auto mt-auto mb-5"><i
-                                        class="fas fa-user-minus"></i> {% if candidatureUserConnected.roleProject.name == 'Membre' %}Se retirer du projet{% elseif candidatureUserConnected.roleProject.name == 'Refusé' %}Supprimer ma candidature{% endif %}{% if candidatureUserConnected.roleProject.name == 'En attente' %}Retirer ma candidature{% endif %}</a>
+                    <div class="border my-3 d-flex flex-column"
+                         style="width: 50%; margin-right: 1em; margin-left: 0.5em">
+                        <h2><u>Votre candidature:</u></h2>
+                        <div class="h4 mt-3">Role/État:</div>
+                        <p class="text-center h1 {% if candidatureUserConnected.roleProject.name == 'Refusé' %} text-danger {% endif %}{% if candidatureUserConnected.roleProject.name == 'En attente' %} text-warning  {% endif %}{% if candidatureUserConnected.roleProject.name == 'Membre' %} text-primary {% endif %}">{{ candidatureUserConnected.roleProject.name }}</p>
+                        <form action="{{ path('modifyApplication', {'idProject': detailsProject.id}) }}" method="POST"
+                              class="d-flex flex-column">
+                            <label for="description" class="h5 mt-3"><u>Votre description:</u></label>
+                            <textarea id="description" name="description" class="form-control mx-auto" maxlength="499"
+                                      placeholder="Entrez ici votre description"
+                                      style="width: 95%; height: 7em; max-height: 7em">{{ candidatureUserConnected.description }}</textarea>
+                            <button type="submit" class="btn btn-outline-primary add mx-5 my-2"><i
+                                        class="fas fa-check"></i> Valider
+                            </button>
+                        </form>
+                        <a href="{{ path('delApplication',  {'idProject': detailsProject.id}) }}"
+                           class="btn btn-danger w-50 add mx-auto mt-auto mb-5"><i
+                                    class="fas fa-user-minus"></i> {% if candidatureUserConnected.roleProject.name == 'Membre' %}Se retirer du projet{% elseif candidatureUserConnected.roleProject.name == 'Refusé' %}Supprimer ma candidature{% endif %}{% if candidatureUserConnected.roleProject.name == 'En attente' %}Retirer ma candidature{% endif %}
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
         <div class="d-flex flex-column mt-3">
-            {% if detailsAdminProjectForEachAdmin|length != 0  %}
-            <h2 class="mx-3"><u>Administrateur(s):</u></h2>
+            {% if detailsAdminProjectForEachAdmin|length != 0 %}
+                <h2 class="mx-3"><u>Administrateur(s):</u></h2>
                 {% for i in 0..detailsAdminProjectForEachAdmin|length-1 %}
                     <div class="d-flex flex-column border" style="margin: 2em">
                         <div class="d-flex flex-row">
@@ -176,48 +183,54 @@
                 <div class="d-flex flex-column  border"
                      style="max-height: 40em; overflow-y: auto;">
                     {% if commentaries|length !=0 %}
-                    {% for i in 0..commentaries|length-1 %}
-                        {% if commentaries[i].id != app.user.id %}
-                            <div class="d-flex flex-column border" style="margin: 1em">
-                                <div class="d-flex flex-row">
-                                    <div class="m-3 justify-content-center d-flex">
-                                        <div class="circular--landscape">
-                                            {% if avatarUserForEachCommentaries[i] is not null %}
-                                                <img src="{{ asset(avatarUserForEachCommentaries[i]) }}"
-                                                     class="w-100 h-100"
-                                                     style="object-fit: cover" alt="Erreur de chargement de l'image">
-                                            {% else %}>
-                                                <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
-                                                     style="object-fit: cover" alt="Erreur de chargement de l'image">
-                                            {% endif %}
+                        {% for i in 0..commentaries|length-1 %}
+                            {% if commentaries[i].id != app.user.id %}
+                                <div class="d-flex flex-column border" style="margin: 1em">
+                                    <div class="d-flex flex-row">
+                                        <div class="m-3 justify-content-center d-flex">
+                                            <div class="circular--landscape">
+                                                {% if avatarUserForEachCommentaries[i] is not null %}
+                                                    <img src="{{ asset(avatarUserForEachCommentaries[i]) }}"
+                                                         class="w-100 h-100"
+                                                         style="object-fit: cover"
+                                                         alt="Erreur de chargement de l'image">
+                                                {% else %}>
+                                                    <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
+                                                         style="object-fit: cover"
+                                                         alt="Erreur de chargement de l'image">
+                                                {% endif %}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="d-flex flex-column w-100">
-                                        <div class="d-flex flex-row mw-100">
-                                            <h4 class=" text-primary">
-                                                <u>{{ commentaries[i].firstname }} {{ commentaries[i].lastname }}</u>
-                                            </h4>
-                                            <a href="{{ path('userReport', {'id':commentaries[i].idUser}) }}"
-                                               class="justify-content-end mt-3" title="Signaler l'utilisateur"
-                                               style="margin-left: auto; margin-right: 1.6em"><i
-                                                        class="far fa-flag text-danger fa-2x"></i></a>
-                                        </div>
-                                        <p><u>{{ commentaries[i].date_comment|date('d-m-Y') }}
-                                                à {{ commentaries[i].date_comment|date('H') }}
-                                                h{{ commentaries[i].date_comment|date('i') }}</u></p>
+                                        <div class="d-flex flex-column w-100">
+                                            <div class="d-flex flex-row mw-100">
+                                                <h4 class=" text-primary">
+                                                    <u>{{ commentaries[i].firstname }} {{ commentaries[i].lastname }}</u>
+                                                </h4>
+                                                <a href="{{ path('userReport', {'id':commentaries[i].idUser}) }}"
+                                                   class="justify-content-end mt-3" title="Signaler l'utilisateur"
+                                                   style="margin-left: auto; margin-right: 1.6em"><i
+                                                            class="far fa-flag text-danger fa-2x"></i></a>
+                                            </div>
+                                            <p><u>{{ commentaries[i].date_comment|date('d-m-Y') }}
+                                                    à {{ commentaries[i].date_comment|date('H') }}
+                                                    h{{ commentaries[i].date_comment|date('i') }}</u></p>
 
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-row border mb-3 m-3">
+                                        <p class="m-3">{{ commentaries[i].comment }}</p>
+                                        <a href="{{ path('commentReport', {'id':commentaries[i].id}) }}"
+                                           class="justify-content-end mt-3" title="Signaler le commentaire"
+                                           style="margin-left: auto; margin-right: 1.6em"><i
+                                                    class="far fa-flag text-danger fa-2x"></i></a>
                                     </div>
                                 </div>
-                                <div class="d-flex flex-row border mb-3 m-3">
-                                    <p class="m-3">{{ commentaries[i].comment }}</p>
-                                    <a href="{{ path('commentReport', {'id':commentaries[i].id}) }}"
-                                       class="justify-content-end mt-3" title="Signaler le commentaire"
-                                       style="margin-left: auto; margin-right: 1.6em"><i
-                                                class="far fa-flag text-danger fa-2x"></i></a>
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="mw-100" style="margin: 2em;">
+                            <div class="h4 my-auto mx-auto text-center">Il n'y a pas de commentaire</div>
+                        </div>
                     {% endif %}
                 </div>
                 {% set commented = 0 %}
@@ -254,18 +267,20 @@
             </div>
         </div>
         {% if candidatureUserConnected.roleProject.name == 'Membre' or candidatureUserConnected.roleProject.name == 'Administrateur' %}
-        <div class="d-flex flex-row mw-100 mx-3 justify-content-center">
-            <a href="{{ path('detailProject',  {'id': 1}) }}" class="btn btn-primary w-25 add mx-auto"><i
-                        class="fas fa-list-ul"></i> Liste des membres</a>
-            <a href="{{ path('detailProject',  {'id': 1}) }}" class="btn btn-primary w-25 add mx-auto"><i
-                        class="fas fa-comments"></i> Espace Discussion</a>
-        </div>
+            <div class="d-flex flex-row mw-100 mx-3 justify-content-center">
+                <a href="{{ path('detailProject',  {'id': 1}) }}" class="btn btn-primary w-25 add mx-auto"><i
+                            class="fas fa-list-ul"></i> Liste des membres</a>
+                <a href="{{ path('detailProject',  {'id': 1}) }}" class="btn btn-primary w-25 add mx-auto"><i
+                            class="fas fa-comments"></i> Espace Discussion</a>
+            </div>
         {% else %}
             <div class="d-flex flex-row mw-100 mx-3 justify-content-center">
                 <button class="btn btn-danger w-25 add mx-auto" disabled><i
-                            class="fas fa-list-ul"></i> Liste des membres</button>
+                            class="fas fa-list-ul"></i> Liste des membres
+                </button>
                 <button class="btn btn-danger w-25 add mx-auto" disabled><i
-                            class="fas fa-comments"></i> Espace Discussion</button>
+                            class="fas fa-comments"></i> Espace Discussion
+                </button>
             </div>
         {% endif %}
     </div>
