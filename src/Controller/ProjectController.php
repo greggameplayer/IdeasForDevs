@@ -11,6 +11,7 @@ use App\Entity\JobsAccount;
 use App\Entity\Status;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\MongoDBException;
+use Exception;
 use MongoDB\BSON\ObjectId;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -138,6 +139,8 @@ class ProjectController extends AbstractController
     /**
      * @Route("/user/userProject", name="userProject")
      * @param Request $request
+     * @param PaginatorInterface $paginator
+     * @param DocumentManager $dm
      * @return Response
      */
     public function userProject(Request $request, PaginatorInterface $paginator, DocumentManager $dm): Response
@@ -149,8 +152,7 @@ class ProjectController extends AbstractController
                 $projectId = $this->getDoctrine()->getRepository(Project::class)->findOneByNameAndId($_GET['search'], $apply->getIdProject()->getId());
 
                 if(isset($projectId)){
-                    $project = dd($this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $projectId ]));
-                    array_push($data, $project);
+                    array_push($data, $this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $projectId ]));
                 }
             }
             else{
@@ -201,7 +203,7 @@ class ProjectController extends AbstractController
             }
         }
 
-        return $this->render('project/index.html.twig', [
+        return $this->render('project/userProject.html.twig', [
             'projects' => $projects,
             'notations' => $projectsNotation,
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
@@ -213,7 +215,7 @@ class ProjectController extends AbstractController
     /**
      * @Route("/newProject", name="newProject")
      * @throws MongoDBException
-     * @throws \Exception
+     * @throws Exception
      */
     public function newProject(Request $request, DocumentManager $dm)
     {
