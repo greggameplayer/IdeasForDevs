@@ -80,18 +80,18 @@
             {% for member in members %}
 
 
-                <div class="card d-flex flex-row">
-                    <div class="card-body d-flex flex-row">
+                <div class="card d-flex flex-row mb-3">
+                    <div class="card-body d-flex flex-row flex-wrap">
                         <div class="col-sm-3" style="margin-right: 1em">
                             <img src="{{ asset('images/noIMG.jpg') }}"  style="width:100%">
                         </div>
-                        <div>
+                        <div style="width: 20em">
                             <h5 class="card-title">{{ member.firstname }} {{ member.lastname }}</h5>
                             <p>Email : {{ member.email }} </p>
                             <p>Détails</p>
                         </div>
-                        {% if isAdmin is defined %}
-                        <div style="margin-top:auto; margin-bottom:auto; margin-left:auto; margin-right:auto">
+                        {% if isAdmin is defined and isAdmin %}
+                        <div style="margin-top:auto; margin-bottom:auto; margin-left:auto; margin-right:auto;width: 5em">
                             <div class="dropdown">
                                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Modifier le rôle
@@ -123,7 +123,7 @@
                 {% set i = 0 %}
                 {% for wait in waiting %}
 
-                    <div class="card d-flex flex-row">
+                    <div class="card d-flex flex-row mb-3">
                         <div class="card-body d-flex flex-row">
                             <div class="col-sm-3" style="margin-right: 1em">
                                 <img src="{{ asset('images/noIMG.jpg') }}"  style="width:100%">

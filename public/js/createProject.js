@@ -1,18 +1,18 @@
 window.addEventListener("load", (event) => {
-    let skills = ["red",""];
+    let skills = [];
     let jobs = [];
 
-    //$("#registration_form_avatar_avatar").attr("accept", "image/png, image/jpeg, image/jpg, image/gif");
+    $("#project_avatar_avatar").attr("accept", "image/png, image/jpeg, image/jpg, image/gif");
 
-    //document.querySelector("#registration_form_avatar_avatar").addEventListener("change", (event) => {
-    //    const target = event.target;
-    //    if (target.files[0].size > 2000000) {
-    //        target.value = "";
-    //    }
-    //    if (!["image/png", "image/jpg", "image/jpeg", "image/gif"].includes(target.files[0].type)) {
-    //        target.value = "";
-    //    }
-    //})
+    document.querySelector("#project_avatar_avatar").addEventListener("change", (event) => {
+        const target = event.target;
+        if (target.files[0].size > 2000000) {
+            target.value = "";
+        }
+        if (!["image/png", "image/jpg", "image/jpeg", "image/gif"].includes(target.files[0].type)) {
+            target.value = "";
+        }
+    })
 
 
     document.querySelector("#skillsbtn").addEventListener("click", (event) => {
@@ -50,18 +50,18 @@ window.addEventListener("load", (event) => {
             $(".multiselect").addClass("btn btn-primary");
         });
 
-    document.querySelector("form[name='form']").addEventListener("submit", (event) => {
+    document.querySelector("form[name='project']").addEventListener("submit", (event) => {
         event.preventDefault();
 
         let data = new FormData();
-        //data.append('avatar', document.querySelector("#project_avatar_avatar").files[0])
-
-        data.append('avatar', document.querySelector("#project_name").value)
-        data.append('avatar', document.querySelector("#project_description").value)
-        data.append('avatar', document.querySelector("#project_repo").value)
-        data.append('avatar', document.querySelector("#project_name").value)
+        data.append('avatar', document.querySelector("#project_avatar_avatar").files[0])
+        data.append('name', document.querySelector("#project_name").value)
+        data.append('description', document.querySelector("#project_description").value)
+        data.append('repo', document.querySelector("#project_repo").value)
         data.append('jobs', JSON.stringify(jobs))
         data.append('skills', JSON.stringify(skills))
+
+        console.log(document.querySelector("#project_avatar_avatar").files[0]);
 
         fetch('/newProject', {
             method: 'POST',

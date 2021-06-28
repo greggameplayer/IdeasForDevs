@@ -3,16 +3,17 @@
 namespace App\Controller;
 
 use App\Document\Avatar;
+use App\Document\ProjectImage;
 use App\Entity\Account;
 use App\Entity\Apply;
 use App\Entity\Job;
 use App\Entity\JobsAccount;
-use App\Form\RegistrationFormType;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use MongoDB\BSON\ObjectId;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
@@ -24,10 +25,16 @@ use App\Entity\RoleProject;
 use App\Form\ApplyType;
 use App\Form\ProjectType;
 use DateTime;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+
 
 class ProjectController extends AbstractController
 {
+    private $filesystem;
+
+    public function __construct(Filesystem $filesystem)
+    {
+        $this->filesystem = $filesystem;
+    }
 
     public function isAdmin($project)
     {
@@ -148,25 +155,21 @@ class ProjectController extends AbstractController
 
         if ($request->isMethod('POST')) {
 
-            // /** @var UploadedFile $document */
-            // $document = $request->files->get("avatar");
-//
-            // if(!in_array($document->guessExtension(), ["png", "jpg", "jpeg", "gif"])) {
-            //     $this->filesystem->remove($document->getPathname());
-            //     return $this->json(["error" => "Le format du fichier pour l'avatar que vous avez envoyé n'est pas supporté !"]);
-            // } else if($document->getSize() > 2000000) {
-            //     $this->filesystem->remove($document->getPathname());
-            //     return $this->json(["error" => "Votre fichier avatar pése plus de 2 Mo !"]);
-            // }
-//
-            // /** @var resource $stream */
-            // $stream = fopen($document->getPathname(), 'r');
-//
-            // /** @var ObjectId $id */
-            // $id = $dm->getDocumentBucket(Avatar::class)->uploadFromStream($document->getClientOriginalName(), $stream);
-            // fclose($stream);
-//
-            // $this->filesystem->remove($document->getPathname());
+            /** @var UploadedFile $document */
+            $document = $request->files->get("avatar");
+            if(!in_array($document->guessExtension(), ["png", "jpg", "jpeg", "gif"])) {
+                $this->filesystem->remove($document->getPathname());
+                return $this->json(["error" => "Le format du fichier pour l'avatar que vous avez envoyé n'est pas supporté !"]);
+            } else if($document->getSize() > 2000000) {
+                $this->filesystem->remove($document->getPathname());
+                return $this->json(["error" => "Votre fichier avatar pése plus de 2 Mo !"]);
+            }
+            /** @var resource $stream */
+            $stream = fopen($document->getPathname(), 'r');
+            /** @var ObjectId $id */
+            $id = $dm->getDocumentBucket(ProjectImage::class)->uploadFromStream($document->getClientOriginalName(), $stream);
+            fclose($stream);
+            $this->filesystem->remove($document->getPathname());
 
             $project = new Project();
 
@@ -176,9 +179,9 @@ class ProjectController extends AbstractController
             $project->setDescription($request->get("description"));
             $project->setStatus(0);
             $project->setDateCreation(new DateTime());
-            $project->setSkills(json_decode($request->get("skills")));
+            $project->setSkillsNeeded(json_decode($request->get("skills")));
             $project->setJobNeeded(json_decode($request->get("jobs")));
-            //$project->setIdMongo($id->serialize());
+            $project->setIdMongo($id->serialize());
             $project->setAccount($this->getUser());
 
             $entityManager = $this->getDoctrine()->getManager();
@@ -196,7 +199,7 @@ class ProjectController extends AbstractController
             $em->persist($apply);
             $em->flush();
 
-            return $this->json(["message" => "good !", "avatarId" => 1]);
+            return $this->json(["message" => "good !"]);
         }
 
         return $this->render('project/createProject.html.twig', [
@@ -305,7 +308,7 @@ class ProjectController extends AbstractController
                 'rejected'=>$rejected,
                 'project' =>$project,
                 'descriptions'=>$description,
-                'isAdmin'=>1
+                'isAdmin'=> 1
             ]); 
         }
 
@@ -369,13 +372,11 @@ class ProjectController extends AbstractController
             //return $this->redirectToRoute('detailProject'); Ajouter la redirection vers le projet
         }
 
-
         return $this->render('project/applyProject.html.twig', [
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
             'project' => $project,
             'form' => $form->createView()
         ]);
-
     }
 
     /**
@@ -401,7 +402,6 @@ class ProjectController extends AbstractController
                 //return $this->redirectToRoute('homepagePatient'); Ajouter la redirection vers le projet
             }
         }
-        
     }
 
     /**
@@ -411,6 +411,8 @@ class ProjectController extends AbstractController
     {
         $project=$this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $idProject]);
         if($this->isAdmin($project)){
+
+            $appliesAdmin = $project->getApplies();
 
             $apply=$this->getDoctrine()->getRepository(Apply::class)->findByProjectUser($idUser, $idProject);
             $projectRole = $this->getDoctrine()->getRepository(RoleProject::class)->findOneBy(['id' => $idStatus]);
