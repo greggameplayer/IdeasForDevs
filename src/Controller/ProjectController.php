@@ -85,8 +85,6 @@ class ProjectController extends AbstractController
             $data = $this->getDoctrine()->getRepository(Project::class)->findAllProjectsOrderByLike();
         }
 
-
-
         $projects = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
@@ -152,7 +150,6 @@ class ProjectController extends AbstractController
         foreach ($applies as $apply){
             if(isset($_GET['search'])){
                 $projectId = $this->getDoctrine()->getRepository(Project::class)->findOneByNameAndId($_GET['search'], $apply->getIdProject()->getId());
-
                 if(isset($projectId)){
                     array_push($data, $this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $projectId ]));
                 }
@@ -168,6 +165,7 @@ class ProjectController extends AbstractController
             $request->query->getInt('page', 1),
             15
         );
+
 
 
         $projectsNotation =[];
@@ -278,7 +276,7 @@ class ProjectController extends AbstractController
             $em->persist($apply);
             $em->flush();
 
-            return $this->json(["message" => "good !"]);
+            return $this->json(["message" => "good !", "idProject" => $project->getId()]);
         }
 
         return $this->render('project/createProject.html.twig', [
