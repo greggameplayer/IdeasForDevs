@@ -1,0 +1,43 @@
+<nav class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top" id="mainNav" style="padding-left: 1em;">
+    <a class="navbar-brand" href="/#page-top">IdeasToDev</a>
+    <button class="navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded" type="button"
+            data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive"
+            aria-expanded="false" aria-label="Toggle navigation" style="margin-right: 2em;">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ms-auto">
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="{{ path('allProjects') }}">Projets</a>
+                </li>
+                <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="{{ path('userProject') }}">Gestion
+                        de projets</a></li>
+            {% endif %}
+            {% if is_granted('IS_ANONYMOUS') %}
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded" href="{{ path('app_login') }}">
+                        {% if locale is defined %}
+                            {% trans from 'messages' into locale %}
+                                signinSignup
+                            {% endtrans %}
+                        {% else %}
+                            Sign in / Sign up
+                        {% endif %}
+                    </a>
+                </li>
+            {% else %}
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded" href="{{ path('profile') }}"><i
+                                class="fas fa-user"></i> Mon
+                        profil</a>
+                </li>
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded text-danger" href="{{ path('app_logout') }}"><i
+                                class="fas fa-user-slash"></i> Se déconnecter</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+
+</nav>

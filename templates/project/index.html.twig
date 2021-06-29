@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Idées{% endblock %}
+
+{% block body %}
+    <style>
+        .square--landscape {
+            display: inline-block;
+            position: relative;
+            width: 200px;
+            height: 200px;
+            overflow: hidden;
+        }
+    </style>
+
+    <section class="page-section">
+        <link rel="stylesheet" href="{{ asset('css/allproject.css') }}">
+        {% include 'project/components/searchbarProject.html.twig' %}
+
+        <div class="container">
+
+            {% set i = 0 %}
+            {% for project in projects.items %}
+
+
+                <div class="card d-flex flex-row" style="margin-bottom: 1em">
+
+                    <div class="card-body d-flex justify-content-center my-auto" style="max-width: 10em">
+                        <form  class="flex-column justify-content-end" style="margin-right: 2em; margin-top: auto; margin-bottom: auto" action="{{ path( 'addLike', {'idProject': project.id } ) }}" method="post">
+                            <input type="hidden" name="url" value="/user/allProjects">
+                            <button type="submit" data-toggle="tooltip" data-placement="top" title="J'aime" style="border: none; background: white"><i class="fas fa-arrow-up fa-2x {% if notations[i][0] == 1 %} text-primary {% else %} text-dark{% endif %}"></i></button>
+                            <p class="text-center {% if notations[i][0] == 1 %} text-primary {% else %} text-dark{% endif %}" style="font-weight: bold; margin-bottom: 0">{{ notations[i][1] }}</p>
+                        </form>
+                        <form class="flex-column"  style="margin-top: auto; margin-bottom: auto" action="{{ path( 'addDislike', {'idProject': project.id } ) }}" method="post">
+                            <input type="hidden" name="url"  value="/user/allProjects">
+                            <button type="submit" data-toggle="tooltip" data-placement="top" title="Je n'aime pas" style="border: none; background: white"> <i class="fas fa-arrow-down fa-2x {% if notations[i][0] == 2 %} text-danger {% else %} text-dark{% endif %} "></i> </button>
+                            <p class="text-center {% if notations[i][0] == 2 %} text-danger {% else %} text-dark{% endif %}" style="font-weight: bold; margin-bottom: 0">{{ notations[i][2] }}</p>
+                        </form>
+                    </div>
+
+                    <div class="flex-row flex-wrap" style="width: 50em">
+
+                        <a href=" {{ path('detailProject',  {'id': project.id}) }}" id="seeMore">
+
+
+
+                        <div class="card-body d-flex flex-row flex-wrap">
+                            <div class="square--landscape justify-content-center" style="margin-right: 1em; min-width: 10em">
+                                {% if imgProject[i] is null %}
+                                    <img src="{{ asset('images/noIMG.jpg') }}"  style="object-fit: cover; width: 100%">
+                                {% else %}
+                                    <img src="{{ asset(imgProject[i]) }}"  style="object-fit: cover; width: 100%">
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <h5 class="card-title">{{ project.name }}</h5>
+                                <div class="d-flex flex-row">
+                                    <p><ins>Créateur du Projet</ins> :</p>
+                                    <p style="font-weight: bold; margin-left: 0.5em">{{ project.firstname }} {{ project.lastname }}</p>
+                                </div>
+                                <p class="card-text"><ins>Description du projet</ins> :  {{ project.description }}</p>
+                            </div>
+                        </div>
+
+                        </a>
+                    </div>
+
+                    <div class="card-body d-flex flex-row-reverse" style="">
+                        <a style="" data-toggle="tooltip" data-placement="top" title="Signaler le projet" href="{{ path( 'applyToProject', {'idProject': project.id, } ) }}"><i class="far fa-flag text-danger"></i></a>
+                    </div>
+                </div>
+
+                {% set i = i + 1 %}
+            {% endfor %}
+
+            <div class="d-flex justify-content-center">
+                {{ knp_pagination_render(projects) }}
+            </div>
+
+        </div>
+
+        <div class="fixed-bottom d-flex flex-row-reverse" style="margin-right: 2em; margin-bottom: 2em">
+            <a data-toggle="tooltip" data-placement="top" title="Créer un nouveau projet" href="{{ path( 'newProject' ) }}"><i class="fas fa-plus fa-3x text-primary"></i></a>
+        </div>
+
+    </section>
+
+
+
+{% endblock %}
