@@ -180,7 +180,7 @@ class ProjectController extends AbstractController
             $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]);
 
             $project->setAccount($account);
-            $roles->append($this->getDoctrine()->getRepository(Apply::class)->findOneBy(['idAccount' => $project->getAccount()->getId(), 'idProject' => $project->getId()])->getRoleProject()->getName());
+            $roles->append($this->getDoctrine()->getRepository(Apply::class)->findOneBy(['idAccount' => $this->getUser(), 'idProject' => $project])->getRoleProject()->getName());
 
             array_push($imgProject, ProfileController::getProjectImage($project, $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir')));
             //To get like and dislike
