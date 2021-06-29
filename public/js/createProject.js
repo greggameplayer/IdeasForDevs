@@ -76,10 +76,7 @@ window.addEventListener("load", (event) => {
                         if (!document.querySelector("#errorAlert").classList.contains("d-none")){
                             document.querySelector("#errorAlert").classList.add("d-none");
                         }
-                        $("#successmodal").modal();
-                        setTimeout(() => {
-                            window.location.href = "/";
-                        }, 5000);
+                        window.location.href = "/project/"+json.idProject;
                     }
                 });
     })
