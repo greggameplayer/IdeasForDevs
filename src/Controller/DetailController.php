@@ -11,7 +11,7 @@ use App\Entity\Status;
 use ArrayObject;
 use DateTime;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use http\Env\Request;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
@@ -175,39 +175,27 @@ class DetailController extends AbstractController
     }
 
     /**
-     * @Route("/commente/{id}", name="commente")
+     * @Route("/project/commente/{id}", name="commente")
      */
-    public function commente($id, Request $request): Response
+    public function commente($id): Response
     {
-        $commente = new commentary();
-        $commente->setComment($_POST['commentaire']);
-        $commente->setIdAccount($this->getUser());
-        $commente->setIdProject($this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $id]));
-        $commente->setDateComment(new DateTime());
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($commente);
-        $em->flush();
+        if($_POST['commentaire'] != ''){
+            $commente = new commentary();
+            $commente->setComment($_POST['commentaire']);
+            $commente->setIdAccount($this->getUser());
+            $commente->setIdProject($this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $id]));
+            date_default_timezone_set('Europe/Paris');
+            $commente->setDateComment(new DateTime());
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($commente);
+            $em->flush();
+        }
 
         return $this->redirectToRoute('detailProject', ["id" => $id]);
     }
 
     /**
-     * @Route("/UpdateCommente/{id}", name="UpdateCommente")
-     */
-    public function UpdateCommente($id): Response
-    {
-        $commente = $this->getDoctrine()->getRepository(Commentary::class)->findOneBy(['idProject' => $id, 'idAccount' => $this->getUser()]);
-        $commente->setComment($_POST['commentaire']);
-        $commente->setDateComment(new DateTime());
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($commente);
-        $em->flush();
-
-        return $this->redirectToRoute('detailProject', ["id" => $id]);
-    }
-
-    /**
-     * @Route("/modifyApplication/{idProject}", name="modifyApplication")
+     * @Route("/project/modifyApplication/{idProject}", name="modifyApplication")
      */
     public function modifyApplication($idProject): Response
     {
@@ -221,7 +209,7 @@ class DetailController extends AbstractController
     }
 
     /**
-     * @Route("/acceptApplication/{idProject}/{idUser}", name="acceptApplication")
+     * @Route("/project/acceptApplication/{idProject}/{idUser}", name="acceptApplication")
      */
     public function acceptApplication($idProject, $idUser): Response
     {
@@ -235,7 +223,7 @@ class DetailController extends AbstractController
     }
 
     /**
-     * @Route("/refuseApplication/{idProject}/{idUser}", name="refuseApplication")
+     * @Route("/project/refuseApplication/{idProject}/{idUser}", name="refuseApplication")
      */
     public function refuseApplication($idProject, $idUser): Response
     {
@@ -249,20 +237,21 @@ class DetailController extends AbstractController
     }
 
     /**
-     * @Route("/delApplication/{idProject}", name="delApplication")
+     * @Route("/project/delApplication/{idProject}", name="delApplication")
      */
     public function delApplication($idProject): Response
     {
         $apply = $this->getDoctrine()->getRepository(Apply::class)->findOneBy(['idProject' => $idProject, 'idAccount' => $this->getUser()]);
+        $apply->setRoleProject($this->getDoctrine()->getRepository(RoleProject::class)->findOneBy(['name' => "Retiré"]));
         $em = $this->getDoctrine()->getManager();
-        $em->remove($apply);
+        $em->persist($apply);
         $em->flush();
 
         return $this->redirectToRoute('detailProject', ["id" => $idProject]);
     }
 
     /**
-     * @Route("/modifyStatus/{idProject}/{status}", name="modifyStatus")
+     * @Route("/project/modifyStatus/{idProject}/{status}", name="modifyStatus")
      */
     public function modifyStatus($idProject, $status): Response
     {

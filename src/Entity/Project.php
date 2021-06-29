@@ -50,7 +50,7 @@ class Project
     private $tempImage;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne (targetEntity=Status::class)
      */
     private $status;
 
@@ -88,7 +88,6 @@ class Project
      * @ORM\ManyToOne(targetEntity=Account::class, inversedBy="projects")
      */
     private $account;
-
 
     public function __construct()
     {
@@ -175,12 +174,12 @@ class Project
         return $this;
     }
 
-    public function getStatus(): ?int
+    public function getStatus(): ?Status
     {
         return $this->status;
     }
 
-    public function setStatus(int $status): self
+    public function setStatus(Status $status): self
     {
         $this->status = $status;
 
@@ -271,7 +270,7 @@ class Project
         return $this;
     }
 
-   
+
 
 
     /**

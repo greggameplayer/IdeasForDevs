@@ -24,7 +24,7 @@
     </style>
 
     <div class="flex-column page-section">
-        <div class="d-flex flex-row flex-wrap-reverse">
+        <div class="d-flex flex-row flex-wrap">
             <div class="d-flex flex-column"
                  style="width: 40em; min-width: 20em; margin: 2em">
                 {% if imgProject is not null %}
@@ -170,8 +170,8 @@
                 <h2 class="mx-3"><u>Commentaire(s):</u></h2>
                 <div class="d-flex flex-column  border"
                      style="max-height: 40em; overflow-y: auto;">
-                    {% for i in 0..commentaries|length-1 %}
-                        {% if commentaries[i].id != app.user.id %}
+                    {% if commentaries|length != 0 %}
+                        {% for i in 0..commentaries|length-1 %}
                             <div class="d-flex flex-column border" style="margin: 1em">
                                 <div class="d-flex flex-row">
                                     <div class="m-3 justify-content-center d-flex">
@@ -179,10 +179,12 @@
                                             {% if avatarUserForEachCommentaries[i] is not null %}
                                                 <img src="{{ asset(avatarUserForEachCommentaries[i]) }}"
                                                      class="w-100 h-100"
-                                                     style="object-fit: cover" alt="Erreur de chargement de l'image">
+                                                     style="object-fit: cover"
+                                                     alt="Erreur de chargement de l'image">
                                             {% else %}>
                                                 <img src="{{ asset('images/noIMG.jpg') }}" class="w-100 h-100"
-                                                     style="object-fit: cover" alt="Erreur de chargement de l'image">
+                                                     style="object-fit: cover"
+                                                     alt="Erreur de chargement de l'image">
                                             {% endif %}
                                         </div>
                                     </div>
@@ -210,68 +212,63 @@
                                                 class="far fa-flag text-danger fa-2x"></i></a>
                                 </div>
                             </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                {% set commented = 0 %}
-                {% for commentary in commentaries %}
-                    {% if commentary.id == app.user.id %}
-                        <div class="mw-100 mx-3 my-2">
-                            <form action="{{ path('UpdateCommente',  {'id': detailsProject.id}) }}" method="POST"
-                                  class="d-flex flex-column">
-                                <label for="commentaire" class="h5"><u>Votre commentaire:</u></label>
-                                <textarea id="commentaire" name="commentaire" class="form-control" maxlength="499"
-                                          placeholder="Entrez ici votre commentaire">{{ commentary.comment }}</textarea>
-                                <button type="submit" class="btn btn-outline-primary mw-100 add mx-5 my-2"><i
-                                            class="fas fa-comment-alt"></i> Valider la
-                                    modification
-                                </button>
-                            </form>
+                        {% endfor %}
+                    {% else %}
+                        <div class="mw-100" style="margin: 2em;">
+                            <div class="h4 my-auto mx-auto text-center">Il n'y a pas de commentaire</div>
                         </div>
-                        {% set commented = 1 %}
                     {% endif %}
-                {% endfor %}
-                {% if commented == 0 %}
-                    <div class="mw-100 mx-3 my-2">
-                        <form action="{{ path('commente', {'id': detailsProject.id}) }}" method="POST"
-                              class="d-flex flex-column">
-                            <label for="commentaire" class="h5"><u>Votre commentaire:</u></label>
-                            <textarea id="commentaire" name="commentaire" class="form-control" maxlength="499"
-                                      placeholder="Entrez ici votre commentaire"></textarea>
-                            <button type="submit" class="btn btn-outline-primary mw-100 add mx-5 my-2"><i
-                                        class="fas fa-comment-alt"></i> Commenter
-                            </button>
-                        </form>
-                    </div>
-                {% endif %}
+                </div>
+                <div class="mw-100 mx-3 my-2">
+                    <form action="{{ path('commente', {'id': detailsProject.id}) }}" method="POST"
+                          class="d-flex flex-column">
+                        <label for="commentaire" class="h5"><u>Votre commentaire:</u></label>
+                        <textarea id="commentaire" name="commentaire" class="form-control" maxlength="499"
+                                  placeholder="Entrez ici votre commentaire"></textarea>
+                        <button type="submit" class="btn btn-outline-primary mw-100 add mx-5 my-2"><i
+                                    class="fas fa-comment-alt"></i> Commenter
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
         <div class="d-flex flex-row mw-100 mx-3 justify-content-center flex-wrap">
             {% if adminAlone %}
                 <div class="d-flex flex-column justify-content-center mx-auto my-2" style="width: 15em">
-                <button class="btn btn-danger add w-100" style="height: 2.5em" disabled> <i
-                            class="fas fa-user-minus"></i> Se retirer du projet</button>
-                <p class="h6 text-danger text-center">Vous ne pouvez pas quitter ce projet car vous etes le seul administrateur</p>
+                    <button class="btn btn-danger add w-100" style="height: 2.5em" disabled><i
+                                class="fas fa-user-minus"></i> Se retirer du projet
+                    </button>
+                    <p class="h6 text-danger text-center">Vous ne pouvez pas quitter ce projet car vous etes le seul
+                        administrateur</p>
                 </div>
             {% else %}
-                <a href="{{ path('delApplication',  {'idProject': detailsProject.id}) }}" style="width: 15em; height: 2.5em" class="btn btn-danger add mx-auto my-2"> <i
+                <a href="{{ path('delApplication',  {'idProject': detailsProject.id}) }}"
+                   style="width: 15em; height: 2.5em" class="btn btn-danger add mx-auto my-2"> <i
                             class="fas fa-user-minus"></i> Se retirer du projet</a>
             {% endif %}
-            <div class="dropdown mx-auto my-2" style="width: 15em; height: 2.5em" >
-                <button class="btn btn-primary add dropdown-toggle w-100" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <div class="dropdown mx-auto my-2" style="width: 15em; height: 2.5em">
+                <button class="btn btn-primary add dropdown-toggle w-100" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Modifier l'état du projet
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="{{ path('modifyStatus', {'idProject':detailsProject.id, 'status':'Recrutement'}) }}">Recrutement {% if detailsProject.status == "Recrutement" %}(Actuelle){% endif %}</a>
-                    <a class="dropdown-item" href="{{ path('modifyStatus', {'idProject':detailsProject.id, 'status':'En cours'}) }}">En cours {% if detailsProject.status == "En cours" %}(Actuelle){% endif %}</a>
-                    <a class="dropdown-item" href="{{ path('modifyStatus', {'idProject':detailsProject.id, 'status':'Abouti'}) }}">Abouti {% if detailsProject.status == "Abouti" %}(Actuelle){% endif %}</a>
+                    <a class="dropdown-item"
+                       href="{{ path('modifyStatus', {'idProject':detailsProject.id, 'status':'Recrutement'}) }}">Recrutement {% if detailsProject.status == "Recrutement" %}(Actuelle){% endif %}</a>
+                    <a class="dropdown-item"
+                       href="{{ path('modifyStatus', {'idProject':detailsProject.id, 'status':'En cours'}) }}">En
+                        cours {% if detailsProject.status == "En cours" %}(Actuelle){% endif %}</a>
+                    <a class="dropdown-item"
+                       href="{{ path('modifyStatus', {'idProject':detailsProject.id, 'status':'Abouti'}) }}">Abouti {% if detailsProject.status == "Abouti" %}(Actuelle){% endif %}</a>
                 </div>
             </div>
-            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 15em; height: 2.5em" class="btn btn-warning add mx-auto my-2"><i
+            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 15em; height: 2.5em"
+               class="btn btn-warning add mx-auto my-2"><i
                         class="fas fa-edit"></i> Modifier le projet</a>
-            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 15em; height: 2.5em" class="btn btn-primary add mx-auto my-2"><i
+            <a href="{{ path('getMembersProject',  {'id': detailsProject.id}) }}" style="width: 15em; height: 2.5em"
+               class="btn btn-primary add mx-auto my-2"><i
                         class="fas fa-list-ul"></i> Liste des membres</a>
-            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 15em; height: 2.5em" class="btn btn-primary add mx-auto my-2"><i
+            <a href="{{ path('detailProject',  {'id': 1}) }}" style="width: 15em; height: 2.5em"
+               class="btn btn-primary add mx-auto my-2"><i
                         class="fas fa-comments"></i> Espace Discussion</a>
         </div>
     </div>

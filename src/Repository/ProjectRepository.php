@@ -54,17 +54,31 @@ class ProjectRepository extends ServiceEntityRepository
             ->andWhere('p.name LIKE :val')
             ->setParameter('val', "%$value%")
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
 
-    public function detailsProject($id) :array
+
+    public function findOneByNameAndId($search, $idProject)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT project.id
+        FROM project
+        WHERE project.id = :idProject AND project.name LIKE :search";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['idProject' => $idProject, 'search' => "%$search%"])->fetchOne();
+    }
+
+    public function detailsProject($id): array
     {
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = "
         SELECT project.id, project.name, project.repo, project.description, project.date_creation, project.id_mongo, status.status
-        FROM project INNER JOIN status ON project.status = status.id
+        FROM project INNER JOIN status ON project.status_id = status.id
         WHERE project.id = :id";
 
         $stmt = $conn->prepare($sql);
@@ -72,7 +86,7 @@ class ProjectRepository extends ServiceEntityRepository
         return $stmt->executeQuery(['id' => $id])->fetchAllAssociative()[0];
     }
 
-    public function skillsAndJobsNeeded($id) :array
+    public function skillsAndJobsNeeded($id): array
     {
         $conn = $this->getEntityManager()->getConnection();
 
@@ -84,6 +98,24 @@ class ProjectRepository extends ServiceEntityRepository
         $stmt = $conn->prepare($sql);
 
         return $stmt->executeQuery(['id' => $id])->fetchAllAssociative()[0];
+    }
+
+    public function findAllProjectsOrderByLike($search = "")
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+        SELECT project.*, account.firstname as firstname, account.lastname as lastname, SUM(is_for.evaluation) as likes, (COUNT(is_for.evaluation) - SUM(is_for.evaluation)) as dislike, account.id as accountId
+        FROM project
+        INNER JOIN account ON project.account_id = account.id
+        LEFT JOIN is_for ON is_for.id_project_id = project.id
+        WHERE project.name LIKE :search
+        GROUP BY project.id ORDER BY SUM(is_for.evaluation) - (COUNT(is_for.evaluation) - SUM(is_for.evaluation)) DESC
+        ";
+
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->executeQuery(['search' => '%' . $search . '%'])->fetchAllAssociative();
     }
 
 
