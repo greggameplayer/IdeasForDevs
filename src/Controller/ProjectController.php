@@ -9,6 +9,7 @@ use App\Entity\Apply;
 use App\Entity\Job;
 use App\Entity\JobsAccount;
 use App\Entity\Status;
+use ArrayObject;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use Exception;
@@ -172,10 +173,15 @@ class ProjectController extends AbstractController
         $projectsNotation =[];
         $imgProject= [];
 
+        $roles = new ArrayObject(array());
+
         foreach($projects as $project){
             //To get creator of the project
             $account = $this->getDoctrine()->getRepository(Account::class)->findOneBy(['id' => $project->getAccount()->getId()]);
+
             $project->setAccount($account);
+            $roles->append($this->getDoctrine()->getRepository(Apply::class)->findOneBy(['idAccount' => $project->getAccount()->getId(), 'idProject' => $project->getId()])->getRoleProject()->getName());
+
             array_push($imgProject, ProfileController::getProjectImage($project, $dm, $this->filesystem, $this->getDoctrine()->getManager(), $this->getParameter('kernel.project_dir')));
             //To get like and dislike
             $test = True;
@@ -207,6 +213,7 @@ class ProjectController extends AbstractController
         return $this->render('project/userProject.html.twig', [
             'projects' => $projects,
             'notations' => $projectsNotation,
+            'roles' => $roles,
             'locale' => strtolower(str_split($_SERVER['HTTP_ACCEPT_LANGUAGE'], 2)[0]),
             'imgProject' => $imgProject
         ]);
@@ -292,7 +299,7 @@ class ProjectController extends AbstractController
     {
         //TODO implement redirection after the creation of the project
         $project = $this->getDoctrine()->getRepository(Project::class)->findOneBy(['id' => $id]);
-        if($this->isAdmin){
+        if($this->isAdmin($project)){
             $form = $this->createForm(ProjectType::class, $project);
             $form->handleRequest($request);
 

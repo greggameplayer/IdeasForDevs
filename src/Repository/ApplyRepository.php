@@ -124,14 +124,12 @@ AND account.id != :idUserConnected
             ;
     }
 
-    public function findUserApplies($id)
+    public function findUserApplies($idUser)
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.id = :val')
-            ->setParameter('val', $id)
-            ->andWhere('p.roleProject = 1' )
-            ->orWhere( 'p.roleProject = 3')
-            ->orWhere('p.roleProject = 4')
+            ->Where('p.idAccount = :val')
+            ->setParameter('val', $idUser)
+            ->andWhere('p.roleProject = 1 OR p.roleProject = 3 OR p.roleProject = 4' )
             ->getQuery()
             ->getResult()
             ;
