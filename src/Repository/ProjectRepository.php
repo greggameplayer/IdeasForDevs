@@ -54,12 +54,12 @@ class ProjectRepository extends ServiceEntityRepository
             ->andWhere('p.name LIKE :val')
             ->setParameter('val', "%$value%")
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
 
 
-    public function findOneByNameAndId($search, $idProject){
+    public function findOneByNameAndId($search, $idProject)
+    {
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = "
@@ -72,7 +72,7 @@ class ProjectRepository extends ServiceEntityRepository
         return $stmt->executeQuery(['idProject' => $idProject, 'search' => "%$search%"])->fetchOne();
     }
 
-    public function detailsProject($id) :array
+    public function detailsProject($id): array
     {
         $conn = $this->getEntityManager()->getConnection();
 
@@ -86,7 +86,7 @@ class ProjectRepository extends ServiceEntityRepository
         return $stmt->executeQuery(['id' => $id])->fetchAllAssociative()[0];
     }
 
-    public function skillsAndJobsNeeded($id) :array
+    public function skillsAndJobsNeeded($id): array
     {
         $conn = $this->getEntityManager()->getConnection();
 
@@ -105,12 +105,21 @@ class ProjectRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = "
-        SELECT project.*, account.firstname as firstname, account.lastname as lastname, SUM(is_for.evaluation) as likes, (COUNT(is_for.evaluation) - SUM(is_for.evaluation)) as dislike, account.id as accountId
+        (SELECT project.*, account.firstname as firstname, account.lastname as lastname, SUM(is_for.evaluation) as likes, (COUNT(is_for.evaluation) - SUM(is_for.evaluation)) as dislike, account.id as accountId
         FROM project
         INNER JOIN account ON project.account_id = account.id
         INNER JOIN is_for ON is_for.id_project_id = project.id
         WHERE project.name LIKE :search
-        GROUP BY project.id ORDER BY SUM(is_for.evaluation) - (COUNT(is_for.evaluation) - SUM(is_for.evaluation)) DESC
+        GROUP BY project.id ORDER BY SUM(is_for.evaluation) - (COUNT(is_for.evaluation) - SUM(is_for.evaluation)) DESC)
+        UNION
+        (SELECT project.*, account.firstname as firstname, account.lastname as lastname, 0 as likes, 0 as dislike, account.id as accountId
+        FROM project, account, is_for
+        WHERE project.id NOT IN (
+        SELECT is_for.id_project_id 
+        FROM is_for)
+        AND project.account_id = account.id
+        AND project.name LIKE :search
+        GROUP BY project.id)
         ";
 
         $stmt = $conn->prepare($sql);
