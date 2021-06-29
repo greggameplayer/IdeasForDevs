@@ -2,7 +2,7 @@
     "name": "greggameplayer/ideastodev",
 	"description": "a School project",
     "type": "project",
-	"version": "1.0.0",
+	"version": "1.1.0",
     "license": "proprietary",
     "minimum-stability": "stable",
     "prefer-stable": true,
