@@ -90,7 +90,7 @@ class ProjectController extends AbstractController
         $projects = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
-            2
+            15
         );
 
 
@@ -166,7 +166,7 @@ class ProjectController extends AbstractController
         $projects = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
-            2
+            15
         );
 
 
